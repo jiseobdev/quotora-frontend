@@ -12,7 +12,8 @@ export default [
 
     ...prefix('projects', [
       index('./projects/list.tsx'),
-    //   route(':id', './projects/details.tsx')
+      route(':id', './projects/details.tsx'),
+      route(':id/rfp', './projects/rfp.tsx'),
     ]),
 
     // ...prefix('rfps', [

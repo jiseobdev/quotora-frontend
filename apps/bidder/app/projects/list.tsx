@@ -1,6 +1,8 @@
+import { Link } from "react-router";
+
 export default function List() {
   return (
-    <main id="dashboard" className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
+    <main className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-semibold text-gray-900">Project 현황 대시보드</h1>
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-3">
@@ -51,7 +53,7 @@ export default function List() {
           </div>
         </div>
         <div className="mt-8">
-          <h2 className="text-lg font-medium text-gray-900">입찰 중</h2>
+          <h2 className="text-lg font-medium text-gray-900">제안서 요청</h2>
           <div className="mt-4 grid gap-5">
             <div className="bg-white shadow rounded-lg p-6">
               <div className="flex justify-between items-start">
@@ -77,11 +79,16 @@ export default function List() {
                     </div>
                   </div>
                 </div>
-                <a href="/project/1" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] transition-colors">
-                  프로젝트 바로가기
-                </a>
+                <Link to="/projects/1/rfp" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] transition-colors">
+                  RFP 내용 확인하기
+                </Link>
               </div>
             </div>
+          </div>
+        </div>
+        <div className="mt-8">
+          <h2 className="text-lg font-medium text-gray-900">입찰 중</h2>
+          <div className="mt-4 grid gap-5">
             <div className="bg-white shadow rounded-lg p-6">
               <div className="flex justify-between items-start">
                 <div>
@@ -106,9 +113,9 @@ export default function List() {
                     </div>
                   </div>
                 </div>
-                <a href="/project/2" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] transition-colors">
+                <Link to="/projects/2" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] transition-colors">
                   프로젝트 바로가기
-                </a>
+                </Link>
               </div>
             </div>
           </div>

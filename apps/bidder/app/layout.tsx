@@ -26,9 +26,9 @@ export default function Layout() {
                 <i className="fa-solid fa-folder-open w-8 text-center"></i>
                 <span>Project</span>
               </NavLink>
-              <NavLink to="/rfps" className={({ isActive }) => clsx("group flex items-center px-2 py-3 text-sm font-medium rounded-md", isActive ? 'bg-[#D6D2F2] text-[#4F46E5]' : 'text-[#303A52] hover:bg-gray-50')}>
+              <NavLink to="/proposals" className={({ isActive }) => clsx("group flex items-center px-2 py-3 text-sm font-medium rounded-md", isActive ? 'bg-[#D6D2F2] text-[#4F46E5]' : 'text-[#303A52] hover:bg-gray-50')}>
                 <i className="fa-solid fa-file-lines w-8 text-center"></i>
-                <span>RFP</span>
+                <span>Proposals</span>
               </NavLink>
               <a href="#" className="text-[#303A52] hover:bg-gray-50 group flex items-center px-2 py-3 text-sm font-medium rounded-md">
                 <i className="fa-solid fa-users w-8 text-center"></i>
