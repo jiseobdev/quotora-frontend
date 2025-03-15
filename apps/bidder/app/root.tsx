@@ -31,6 +31,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js" crossOrigin="anonymous" referrerPolicy="no-referrer"></script>
       </head>
       <body>
         {children}
