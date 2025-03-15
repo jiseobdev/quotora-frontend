@@ -10,10 +10,10 @@ export default [
   layout('./layout.tsx', [
     index('./index.tsx'),
 
-    // ...prefix('projects', [
-    //   index('./projects/list.tsx'),
+    ...prefix('projects', [
+      index('./projects/list.tsx'),
     //   route(':id', './projects/details.tsx')
-    // ]),
+    ]),
 
     // ...prefix('rfps', [
     //   index('./rfps/list.tsx'),
