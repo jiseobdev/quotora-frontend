@@ -1,6 +1,7 @@
 import { data, Link, redirect } from 'react-router';
 import type { Route } from './+types/signin';
 import { accessTokenCookie, authenticator } from '~/auth.server';
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from '~/components/ui/alert-dialog';
 
 export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get('Cookie');
@@ -60,7 +61,40 @@ export default function Signin() {
                 <input type="checkbox" className="h-4 w-4 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]" />
                 <label className="ml-2 block text-sm text-gray-700">로그인 상태 유지</label>
               </div>
-              <span className="text-sm font-medium text-[#4F46E5] hover:text-[#4F46E5]/80 cursor-pointer">비밀번호 찾기</span>
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <span className="text-sm font-medium text-[#4F46E5] hover:text-[#4F46E5]/80 cursor-pointer">비밀번호 찾기</span>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <div className="bg-white rounded-2xl shadow-xl p-8">
+                    <div className="text-center mb-8">
+                      <h2 className="text-[#4F46E5] text-3xl font-semibold mb-4">Quotora</h2>
+                      <h1 className="text-2xl font-extrabold text-gray-900 mb-2">비밀번호를 잊으셨나요?</h1>
+                      <p className="text-gray-600">회사 이메일 주소를 입력하시면<br />비밀번호 재설정 코드를 보내드립니다.</p>
+                    </div>
+                    <form className="space-y-6">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
+                          회사 이메일
+                        </label>
+                        <div className="relative">
+                          <i className="h-(--text-base) fa-regular fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                          <input type="email" id="email" name="email" className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600" placeholder="name@company.com" required={true} />
+                        </div>
+                      </div>
+                      <button type="submit" className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-colors">
+                        재설정 코드 받기
+                      </button>
+                    </form>
+                    <div className="mt-6 flex justify-center">
+                      <AlertDialogCancel className="border-0 text-sm text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-2">
+                        <i className="fa-solid fa-arrow-left h-(--text-xs)"></i>
+                        로그인으로 돌아가기
+                      </AlertDialogCancel>
+                    </div>
+                  </div>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
             <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#4F46E5] hover:bg-[#4F46E5]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5]">
               로그인
