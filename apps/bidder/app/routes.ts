@@ -16,11 +16,11 @@ export default [
       route(':id/rfp', './projects/rfp.tsx'),
     ]),
 
-    // ...prefix('rfps', [
-    //   index('./rfps/list.tsx'),
-    //   route('new', './rfps/new.tsx'),
-    //   route(':id/send', './rfps/send.tsx'),
-    //   route(':id', './rfps/details.tsx')
-    // ]),
+    ...prefix('proposals', [
+      index('./proposals/list.tsx'),
+      route('new', './proposals/new.tsx'),
+      // route(':id', './rfps/details.tsx'),
+      route(':id/send', './proposals/send.tsx'),
+    ]),
   ]),
 ] satisfies RouteConfig;
