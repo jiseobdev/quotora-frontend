@@ -1,26 +1,179 @@
+import { data, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/details";
+import { getAccessToken } from "~/auth.server";
+import { differenceInCalendarDays } from "date-fns";
+import { loader as reviewsLoader } from './reviews';
+
+interface Rfp {
+  id: number;
+  name: string;
+  overview: string;
+  desiredLegalAdvice: string;
+  specialRequirements: string;
+  expectedSchedule: string;
+  submissionDeadline: string;
+  selectionNotificationDate: string;
+  oralPresentation: boolean;
+  rawfirms: string[];
+  selectionCriteria: { name: string; weight: number; }[];
+  estimatedCost: number;
+  status: "WRITING" | "WRITTEN" | "BIDDING" | "CLOSED";
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Proposal {
+  id: number;
+  lawfirmName: string;
+  nda: boolean;
+  participate: boolean;
+  files: [];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  name: string;
+  rfpId: number;
+  ordererName: string;
+  expectedSchedule: string;
+  overview: string;
+  desiredLegalAdvice: string;
+  specialRequirements: string;
+  oralPresentation: boolean;
+  sentAt: string;
+}
+
+interface Review {
+  id: number;
+  content: string;
+  reviewer: { name: string };
+  createdAt: string;
+}
+
+function getDDay(targetDate: Date): string {
+  const today = new Date();
+  const diff = differenceInCalendarDays(targetDate, today);
+
+  if (diff > 0) {
+    return `D-${diff}`;
+  } else if (diff === 0) {
+    return 'D-Day';
+  } else {
+    return `D+${Math.abs(diff)}`;
+  }
+}
+
+async function fetchRfp(id: string, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}`, process.env.BACKEND_API_URL), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: Rfp = await response.json();
+
+  return result;
+}
+
+async function fetchProposals(id: string, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/proposals`, process.env.BACKEND_API_URL), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: Proposal[] = await response.json();
+
+  return result;
+}
+
+async function fetchReviews(id: string, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/reviews`, process.env.BACKEND_API_URL), {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: Review[] = await response.json();
+
+  return result;
+}
+
+export async function loader({ request, params: { id } }: Route.LoaderArgs) {
+  const token = await getAccessToken(request);
+
+  const rfp = await fetchRfp(id, token);
+  const proposals = await fetchProposals(id, token);
+  const reviews = await fetchReviews(id, token);
+
+  return data({
+    rfp,
+    proposals,
+    reviews,
+  });
+}
 
 export default function Details({ params: { id } }: Route.ComponentProps) {
+  const loaderData = useLoaderData<typeof loader>();
+  const { data: reviewsData, Form: ReviewsForm } = useFetcher<typeof reviewsLoader>();
+
+  const { rfp, proposals } = loaderData;
+  const reviews = reviewsData?.reviews ?? loaderData.reviews;
+
+  const proposalsByRawfirms = Object.fromEntries(
+    rfp.rawfirms.map((firmName) => ([firmName, proposals.find((proposal) => proposal.lawfirmName === firmName)]))
+  );
+
   return (
     <main className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-semibold text-gray-900">2025년 법무자문 입찰</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">{rfp.name}</h1>
             <div className="flex gap-4">
               <div className="text-center">
                 <span className="text-sm text-gray-500">입찰마감</span>
-                <p className="text-lg font-semibold text-red-600">D+1</p>
+                <p className="text-lg font-semibold text-red-600">{getDDay(new Date(rfp.submissionDeadline))}</p>
               </div>
               <div className="text-center">
                 <span className="text-sm text-gray-500">확정통보</span>
-                <p className="text-lg font-semibold text-blue-600">D-14</p>
+                <p className="text-lg font-semibold text-blue-600">{getDDay(new Date(rfp.selectionNotificationDate))}</p>
               </div>
             </div>
           </div>
           <div className="mt-6 flex gap-4">
             <input type="text" className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="일자 변경, 사무실 위치 및 주차 안내 등 공지사항 등 기재" />
-              <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">공지올리기</button>
+            <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">공지올리기</button>
           </div>
         </div>
         <div id="bid-management" className="mt-8">
@@ -38,52 +191,45 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                <tr>
-                  <td className="px-4 py-4">김&amp;장</td>
-                  <td className="px-4 py-4"><i className="fa-solid fa-check text-green-500"></i> / <i className="fa-solid fa-check text-green-500"></i></td>
-                  <td className="px-4 py-4"><span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">제출완료</span></td>
-                  <td className="px-4 py-4"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">검토중</span></td>
-                  <td className="px-4 py-4">
-                    <div className="flex gap-2">
-                      <button className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600">Y</button>
-                      <button className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600">N</button>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <button className="px-3 py-1 text-xs bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">
-                      <i className="fa-solid fa-message mr-1"></i>연락하기
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-4">법무법인 광장</td>
-                  <td className="px-4 py-4"><i className="fa-solid fa-check text-green-500"></i> / <i className="fa-solid fa-check text-green-500"></i></td>
-                  <td className="px-4 py-4"><span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">제출완료</span></td>
-                  <td className="px-4 py-4"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">검토중</span></td>
-                  <td className="px-4 py-4">
-                    <div className="flex gap-2">
-                      <button className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600">Y</button>
-                      <button className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600">N</button>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <button className="px-3 py-1 text-xs bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">
-                      <i className="fa-solid fa-message mr-1"></i>연락하기
-                    </button>
-                  </td>
-                </tr>
-                <tr className="opacity-60">
-                  <td className="px-4 py-4">태평양</td>
-                  <td className="px-4 py-4"><i className="fa-solid fa-check text-green-500"></i> / <i className="fa-solid fa-xmark text-red-500"></i></td>
-                  <td className="px-4 py-4">-</td>
-                  <td className="px-4 py-4">-</td>
-                  <td className="px-4 py-4">-</td>
-                  <td className="px-4 py-4">-</td>
-                </tr>
+                {rfp.rawfirms.map((firm) => (
+                  <tr>
+                    <td className="px-4 py-4">{firm}</td>
+                    <td className="px-4 py-4">
+                      {proposalsByRawfirms[firm]?.nda ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
+                      /
+                      {proposalsByRawfirms[firm]?.participate ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
+                    </td>
+                    {proposalsByRawfirms[firm]?.nda && proposalsByRawfirms[firm]?.participate ?
+                      (<>
+                        <td className="px-4 py-4">
+                          {(proposalsByRawfirms[firm]?.files.length ?? 0) > 0 ? (<span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">제출완료</span>) : (<span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">미제출</span>)}
+                        </td>
+                        <td className="px-4 py-4"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{proposalsByRawfirms[firm]?.status}</span></td>
+                        <td className="px-4 py-4">
+                          <div className="flex gap-2">
+                            <button className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600">Y</button>
+                            <button className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600">N</button>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <button className="px-3 py-1 text-xs bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">
+                            <i className="fa-solid fa-message mr-1"></i>연락하기
+                          </button>
+                        </td>
+                      </>) :
+                      (<>
+                        <td className="px-4 py-4">-</td>
+                        <td className="px-4 py-4">-</td>
+                        <td className="px-4 py-4">-</td>
+                        <td className="px-4 py-4">-</td>
+                      </>)
+                    }
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
-          <div id="communication-section" className="mt-6 space-y-4">
+          {/* <div id="communication-section" className="mt-6 space-y-4">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">김&amp;장 커뮤니케이션</h3>
@@ -120,7 +266,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div id="proposal-review" className="mt-8">
           <div className="flex justify-between items-center mb-6">
@@ -128,7 +274,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             <div className="flex items-center gap-4">
               <div className="text-sm text-gray-600">
                 <span className="font-medium">선정기준:</span>
-                <span className="ml-2">전문성 50% | 비용 20% | 프로젝트 수행계획 30%</span>
+                <span className="ml-2">{rfp.selectionCriteria.map((criteria) => `${criteria.name} ${criteria.weight}%`).join(' | ')}</span>
               </div>
               <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">제안서 분석하기</button>
             </div>
@@ -136,45 +282,19 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="space-y-6">
               <div className="grid grid-cols-3 gap-4">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="text-lg font-medium mb-2">전문성 평가</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span>김&amp;장</span>
-                      <span className="font-medium">45/50</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>법무법인 광장</span>
-                      <span className="font-medium">42/50</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h4 className="text-lg font-medium mb-2">비용 평가</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span>김&amp;장</span>
-                      <span className="font-medium">18/20</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>법무법인 광장</span>
-                      <span className="font-medium">16/20</span>
+                {rfp.selectionCriteria.map((criteria) => (
+                  <div key={criteria.name} className="bg-blue-50 p-4 rounded-lg">
+                    <h4 className="text-lg font-medium mb-2">{criteria.name}</h4>
+                    <div className="space-y-2">
+                      {proposals.filter((proposal) => proposal.nda && proposal.participate).map((proposal) => (
+                        <div key={proposal.lawfirmName} className="flex justify-between items-center">
+                          <span>{proposal.lawfirmName}</span>
+                          <span className="font-medium">0/50</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h4 className="text-lg font-medium mb-2">프로젝트 수행계획</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span>김&amp;장</span>
-                      <span className="font-medium">28/30</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>법무법인 광장</span>
-                      <span className="font-medium">27/30</span>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
               <div className="border-t pt-6">
                 <h4 className="text-lg font-medium mb-4">종합 평가</h4>
@@ -185,32 +305,24 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
               <div id="team-comments" className="border-t pt-6">
                 <h4 className="text-lg font-medium mb-4">팀원 의견</h4>
                 <div className="space-y-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">홍길동</span>
-                      <div className="flex gap-2">
-                        <button className="text-sm text-blue-600 hover:text-blue-800">수정</button>
-                        <button className="text-sm text-red-600 hover:text-red-800">삭제</button>
+                  {reviews.map((review) => (
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium">{review.reviewer.name}</span>
+                        <div className="flex gap-2">
+                          <button className="text-sm text-blue-600 hover:text-blue-800">수정</button>
+                          <button className="text-sm text-red-600 hover:text-red-800">삭제</button>
+                        </div>
                       </div>
+                      <p className="text-sm text-gray-700">{review.content}</p>
                     </div>
-                    <p className="text-sm text-gray-700">프로젝트 수행 경험이 풍부하고 전담 인력 구성이 우수합니다.</p>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">김철수</span>
-                      <div className="flex gap-2">
-                        <button className="text-sm text-blue-600 hover:text-blue-800">수정</button>
-                        <button className="text-sm text-red-600 hover:text-red-800">삭제</button>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700">비용 측면에서 효율적인 제안을 했다고 생각합니다.</p>
-                  </div>
-                  <div className="mt-4">
+                  ))}
+                  <ReviewsForm className="mt-4" method="POST">
                     <textarea className="w-full rounded-md border-gray-300" rows={3} placeholder="의견을 입력하세요"></textarea>
                     <div className="mt-2 flex justify-end">
-                      <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">의견 등록</button>
+                      <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">의견 등록</button>
                     </div>
-                  </div>
+                  </ReviewsForm>
                 </div>
               </div>
             </div>
