@@ -32,3 +32,10 @@ export const accessTokenCookie = createCookie('access_token', {
   path: '/',
   maxAge: 60 * 60,
 });
+
+export async function getAccessToken(request: Request) {
+  const cookieHeader = request.headers.get('Cookie');
+  const accessToken = await accessTokenCookie.parse(cookieHeader);
+
+  return accessToken;
+}
