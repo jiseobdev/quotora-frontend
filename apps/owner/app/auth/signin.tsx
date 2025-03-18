@@ -3,19 +3,6 @@ import type { Route } from './+types/signin';
 import { accessTokenCookie, authenticator } from '~/auth.server';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from '~/components/ui/alert-dialog';
 
-export async function loader({ request }: Route.LoaderArgs) {
-  const cookieHeader = request.headers.get('Cookie');
-  const accessToken = await accessTokenCookie.parse(cookieHeader);
-
-  if (accessToken) {
-    return redirect('/', {
-      headers: {
-        'Set-Cookie': await accessTokenCookie.serialize(accessToken),
-      },
-    });
-  }
-}
-
 export async function action({ request }: Route.ActionArgs) {
   const accessToken = await authenticator.authenticate('form', request);
 

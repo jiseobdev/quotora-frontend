@@ -1,6 +1,56 @@
-import { Link } from "react-router";
+import { data, Link, redirect, UNSAFE_ErrorResponseImpl, useFetcher } from "react-router";
+import { z } from 'zod';
+import type { Route } from "./+types/signup";
+
+const schema = z.object({
+  fullName: z.string().nonempty(),
+  companyEmail: z.string().email(),
+  companyName: z.string().nonempty(),
+  position: z.string().nonempty(),
+  password: z.string().nonempty(),
+});
+
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const body = Object.fromEntries(formData.entries());
+
+  const response = await fetch(new URL('/api/v1/users/registration/orderer', process.env.BACKEND_API_URL), {
+    method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      body,
+    );
+  }
+
+  return redirect('/signin');
+}
+
+export async function clientAction({ request, serverAction }: Route.ClientActionArgs) {
+  const formData = await request.clone().formData();
+  const body = Object.fromEntries(formData.entries());
+
+  const result = schema.safeParse(body);
+
+  if (!result.success) {
+    return data({ errors: result.error });
+  }
+
+  return serverAction();
+}
 
 export default function Signin() {
+  const fetcher = useFetcher();
+  const { Form, data = {} } = fetcher;
+  const { errors } = data;
+
   return (
     <div id="signup-page" className="flex min-h-[100vh] bg-gray-50">
       <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 relative">
@@ -21,27 +71,27 @@ export default function Signin() {
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">계정 생성</h2>
           </div>
-          <form className="mt-8 space-y-6">
+          <Form className="mt-8 space-y-6" method="post">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">이름 *</label>
-                <input type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">이름 *</label>
+                <input id="fullName" name="fullName" type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">회사 이메일 *</label>
-                <input type="email" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <label htmlFor="companyEmail" className="block text-sm font-medium text-gray-700">회사 이메일 *</label>
+                <input id="companyEmail" name="companyEmail" type="email" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">회사명 *</label>
-                <input type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">회사명 *</label>
+                <input id="companyName" name="companyName" type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">직위 *</label>
-                <input type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <label htmlFor="position" className="block text-sm font-medium text-gray-700">직위 *</label>
+                <input id="position" name="position" type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">비밀번호 *</label>
-                <input type="password" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호 *</label>
+                <input id="password" name="password" type="password" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
               </div>
             </div>
             <div>
@@ -56,7 +106,7 @@ export default function Signin() {
                 </Link>
               </p>
             </div>
-          </form>
+          </Form>
         </div>
       </div>
     </div>

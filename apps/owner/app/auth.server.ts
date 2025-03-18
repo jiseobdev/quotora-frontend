@@ -9,16 +9,19 @@ authenticator.use(
     const email = form.get('email');
     const password = form.get('password');
 
-    const response = await fetch('http://localhost:3000/api/auth/login', {
+    const response = await fetch(new URL('/api/v1/users/login', process.env.BACKEND_API_URL), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        companyEmail: email,
+        password,
+      }),
     });
-    const data = await response.json();
+    const data: { token: string } = await response.json();
 
-    return data.access_token as string;
+    return data.token as string;
   }),
 );
 
