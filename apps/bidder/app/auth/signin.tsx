@@ -1,4 +1,4 @@
-import { data, Link, redirect } from 'react-router';
+import { data, Form, Link, redirect } from 'react-router';
 import type { Route } from './+types/signin';
 import { accessTokenCookie, authenticator } from '~/auth.server';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from '~/components/ui/alert-dialog';
@@ -28,7 +28,7 @@ export default function Signin() {
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">오늘도 반갑습니다</h2>
           </div>
-          <form className="mt-8 space-y-6">
+          <Form className="mt-8 space-y-6" method="POST">
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">회사 이메일</label>
@@ -92,7 +92,7 @@ export default function Signin() {
                 <span className="text-[#4F46E5] hover:text-[#4F46E5]/80 cursor-pointer ml-1">회원가입</span>
               </Link>
             </p>
-          </form>
+          </Form>
         </div>
       </div>
     </div>
