@@ -308,7 +308,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                   {reviews.map((review) => (
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">{review.reviewer.name}</span>
+                        <span className="font-medium">{review.reviewer?.name}</span>
                         <div className="flex gap-2">
                           <button className="text-sm text-blue-600 hover:text-blue-800">수정</button>
                           <button className="text-sm text-red-600 hover:text-red-800">삭제</button>
