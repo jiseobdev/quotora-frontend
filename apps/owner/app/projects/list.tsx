@@ -2,31 +2,7 @@ import { format } from 'date-fns';
 import { data, Link, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import type { Route } from "./+types/list";
 import { getAccessToken } from "~/auth.server";
-
-interface Rfp {
-  id: number;
-  name: string;
-  overview: string;
-  desiredLegalAdvice: string;
-  specialRequirements: string;
-  expectedSchedule: string;
-  submissionDeadline: string;
-  selectionNotificationDate: string;
-  oralPresentation: boolean;
-  rawfirms: string[];
-  selectionCriteria: { name: string; weight: number; }[];
-  estimatedCost: number;
-  status: "WRITING" | "WRITTEN" | "BIDDING" | "CLOSED";
-  createdAt: string;
-  updatedAt: string;
-}
-
-const STATUS_TO_LABEL = {
-  "WRITING": '작성 중',
-  "WRITTEN": '작성 완료',
-  "BIDDING": '입찰 중',
-  "CLOSED": '입찰 종료'
-};
+import { STATUS_TO_LABEL } from './constants';
 
 async function fetchDashboard(token?: string) {
   const response = await fetch(new URL('/api/v1/orderer/rfps/dashboard', process.env.BACKEND_API_URL), {

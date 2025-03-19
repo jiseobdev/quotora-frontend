@@ -2,13 +2,6 @@ import { data, UNSAFE_ErrorResponseImpl } from "react-router";
 import { getAccessToken } from "~/auth.server";
 import type { Route } from "./+types/reviews";
 
-interface Review {
-  id: number;
-  content: string;
-  reviewer: { name: string };
-  createdAt: string;
-}
-
 async function fetchReviews(id: string, token?: string) {
   const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/reviews`, process.env.BACKEND_API_URL), {
     method: 'GET',
