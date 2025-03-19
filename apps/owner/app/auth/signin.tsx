@@ -33,13 +33,13 @@ export default function Signin() {
               <div>
                 <label className="block text-sm font-medium text-gray-700">회사 이메일</label>
                 <div className="mt-1">
-                  <input type="email" required={true} className="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-[#4F46E5] focus:border-[#4F46E5]" placeholder="name@company.com" />
+                  <input name="email" type="email" required={true} className="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-[#4F46E5] focus:border-[#4F46E5]" placeholder="name@company.com" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">비밀번호</label>
                 <div className="mt-1">
-                  <input type="password" required={true} className="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-[#4F46E5] focus:border-[#4F46E5]" placeholder="••••••••" />
+                  <input name="password" type="password" required={true} className="block w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-[#4F46E5] focus:border-[#4F46E5]" placeholder="••••••••" />
                 </div>
               </div>
             </div>
