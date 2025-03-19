@@ -228,7 +228,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
               </tbody>
             </table>
           </div>
-          {/* <div id="communication-section" className="mt-6 space-y-4">
+          <div id="communication-section" className="mt-6 space-y-4">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">김&amp;장 커뮤니케이션</h3>
@@ -265,7 +265,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 </div>
               </div>
             </div>
-          </div> */}
+          </div>
         </div>
         <div id="proposal-review" className="mt-8">
           <div className="flex justify-between items-center mb-6">
