@@ -10,7 +10,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   const selectionCriteriaNames = formData.getAll('selectionCriteriaNames');
   const selectionCriteriaWeights = formData.getAll('selectionCriteriaWeights');
-  const { selectionCriteriaNames: _, selectionCriteriaWeights: __, ...body } = Object.fromEntries(formData.entries());
+  const { selectionCriteriaNames: _, selectionCriteriaWeights: __, rawfirms, ...body } = Object.fromEntries(formData.entries());
 
   const selectionCriteria = selectionCriteriaNames.map((name, index) => ({ name, weight: parseInt(selectionCriteriaWeights[index].toString(), 10) }));
 
@@ -23,6 +23,7 @@ export async function action({ request }: Route.ActionArgs) {
       body: JSON.stringify({
         ...body,
         selectionCriteria,
+        rawfirms: rawfirms.toString().split(',').map((firm) => firm.trim()),
       }),
   });
 
