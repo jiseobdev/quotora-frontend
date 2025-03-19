@@ -2,7 +2,8 @@ import { format } from 'date-fns';
 import { data, Link, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import type { Route } from "./+types/list";
 import { getAccessToken } from "~/auth.server";
-import { STATUS_TO_LABEL } from './constants';
+import { STATUS_TO_CLASSNAME, STATUS_TO_LABEL } from './constants';
+import { fetchRfps } from '~/lib/fetch';
 
 async function fetchDashboard(token?: string) {
   const response = await fetch(new URL('/api/v1/orderer/rfps/dashboard', process.env.BACKEND_API_URL), {
@@ -22,28 +23,6 @@ async function fetchDashboard(token?: string) {
   }
 
   const result: { totalDraftRfps: number, totalBiddingRfps: number, totalClosedBiddingRfps: number } = await response.json();
-
-  return result;
-};
-
-async function fetchRfps(status: string, token?: string) {
-  const response = await fetch(new URL(`/api/v1/orderer/rfps?status=${status}`, process.env.BACKEND_API_URL), {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-
-  if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
-  }
-
-  const result: Rfp[] = await response.json();
 
   return result;
 };
@@ -138,7 +117,7 @@ export default function List() {
                         </div>
                       </div>
                     </div>
-                    <span className="px-3 py-1 text-sm rounded-full bg-[#D6D2F2] text-[#4F46E5]">{STATUS_TO_LABEL[rfp.status]}</span>
+                    <span className={`px-3 py-1 text-sm rounded-full ${STATUS_TO_CLASSNAME[rfp.status]}`}>{STATUS_TO_LABEL[rfp.status]}</span>
                   </div>
                   <div className="mt-4">
                     <p className="text-sm text-gray-500">제안서 수신 로펌</p>

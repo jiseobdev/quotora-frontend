@@ -1,6 +1,24 @@
-import { Link } from "react-router";
+import { data, Link, useLoaderData } from "react-router";
+import type { Route } from "./+types/list";
+import { fetchRfps } from "~/lib/fetch";
+import { getAccessToken } from "~/auth.server";
+import { STATUS_TO_CLASSNAME, STATUS_TO_LABEL } from "./constants";
+import { format } from "date-fns";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const token = await getAccessToken(request);
+
+  const rfps =
+    ([] as Rfp[])
+      .concat(...(await Promise.all(Object.keys(STATUS_TO_LABEL).map((status) => fetchRfps(status, token)))))
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+  return data({ rfps });
+}
 
 export default function List() {
+  const { rfps = [] } = useLoaderData<typeof loader>();
+
   return (
     <main id="main" className="pt-24 px-6 pb-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="flex space-x-4 mb-6">
@@ -35,46 +53,41 @@ export default function List() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            <tr className="hover:bg-gray-50">
-              <td className="px-6 py-4">
-                <input type="checkbox" className="rounded text-[#4F46E5]" />
-              </td>
-              <td className="px-6 py-4">
-                <Link to="./test">특허 소송 대응</Link>
-              </td>
-              <td className="px-6 py-4">2025.02.15</td>
-              <td className="px-6 py-4"><span className="px-2 py-1 text-yellow-700 bg-yellow-100 rounded-full text-sm">초안</span></td>
-              <td className="px-6 py-4">₩50,000,000</td>
-              <td className="px-6 py-4">특허전문, 규모 상위 4개사</td>
-              <td className="px-6 py-4">
-                <div className="flex space-x-2">
-                  <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-pen"></i></button>
-                  <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-check"></i></button>
-                  <Link to="./test/send" className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-paper-plane"></i></Link>
-                </div>
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-50">
-              <td className="px-6 py-4">
-                <input type="checkbox" className="rounded text-[#4F46E5]" />
-              </td>
-              <td className="px-6 py-4">
-                <Link to="./test">
-                  기업 인수 자문
-                </Link>
-              </td>
-              <td className="px-6 py-4">2025.02.14</td>
-              <td className="px-6 py-4"><span className="px-2 py-1 text-green-700 bg-green-100 rounded-full text-sm">확정</span></td>
-              <td className="px-6 py-4">₩100,000,000</td>
-              <td className="px-6 py-4">김&amp;장, 광장, 화우</td>
-              <td className="px-6 py-4">
-                <div className="flex space-x-2">
-                  <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-pen"></i></button>
-                  <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-check"></i></button>
-                  <Link to="./test/send" className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-paper-plane"></i></Link>
-                </div>
-              </td>
-            </tr>
+            {rfps.map((rfp) => (
+              <tr key={rfp.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  <input type="checkbox" className="rounded text-[#4F46E5]" />
+                </td>
+                <td className="px-6 py-4">
+                  <Link to={`./${rfp.id}`}>{rfp.name}</Link>
+                </td>
+                <td className="px-6 py-4">{format(rfp.updatedAt, 'P')}</td>
+                <td className="px-6 py-4">
+                  <span className={`px-2 py-1 rounded-full text-sm ${STATUS_TO_CLASSNAME[rfp.status]}`}>
+                    {STATUS_TO_LABEL[rfp.status]}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  {new Intl.NumberFormat(navigator.language, { style: "currency", currency: "KRW" }).format(rfp.estimatedCost)}
+                </td>
+                <td className="px-6 py-4">{rfp.rawfirms.join(', ')}</td>
+                <td className="px-6 py-4">
+                  <div className="flex space-x-2">
+                    {rfp.status === "WRITING" && (
+                      <>
+                        <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-pen"></i></button>
+                        <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-check"></i></button>
+                      </>
+                    )}
+                    {rfp.status === "WRITTEN" && (
+                      <Link to={`./${rfp.id}/send`} className="text-gray-400 hover:text-[#4F46E5]">
+                        <i className="fa-solid fa-paper-plane"></i>
+                      </Link>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
