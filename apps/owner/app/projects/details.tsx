@@ -2,7 +2,6 @@ import { data, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { differenceInCalendarDays } from "date-fns";
-import { loader as reviewsLoader } from './reviews';
 
 interface Rfp {
   id: number;
@@ -145,7 +144,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 
 export default function Details({ params: { id } }: Route.ComponentProps) {
   const loaderData = useLoaderData<typeof loader>();
-  const { data: reviewsData, Form: ReviewsForm } = useFetcher<typeof reviewsLoader>();
+  const { data: reviewsData, Form: ReviewsForm } = useFetcher<{ reviews: Review[] }>();
 
   const { rfp, proposals } = loaderData;
   const reviews = reviewsData?.reviews ?? loaderData.reviews;
@@ -192,7 +191,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {rfp.rawfirms.map((firm) => (
-                  <tr>
+                  <tr key={firm}>
                     <td className="px-4 py-4">{firm}</td>
                     <td className="px-4 py-4">
                       {proposalsByRawfirms[firm]?.nda ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
@@ -281,7 +280,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="space-y-6">
-              <div className="grid grid-cols-3 gap-4">
+              {/* <div className="grid grid-cols-3 gap-4">
                 {rfp.selectionCriteria.map((criteria) => (
                   <div key={criteria.name} className="bg-blue-50 p-4 rounded-lg">
                     <h4 className="text-lg font-medium mb-2">{criteria.name}</h4>
@@ -301,14 +300,14 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
                   <p className="text-sm text-gray-700">김&amp;장이 총점 91점으로 가장 높은 점수를 획득했습니다. 법률자문 비용이 1억까지는 김&amp;장이 저렴하지만 1억이 넘어가면 법무법인 광장이 더 저렴합니다. 최근 3년간 유사 프로젝트 수행 이력이 김&amp;장이 더 많아 전문성에서 우위를 보였습니다.</p>
                 </div>
-              </div>
-              <div id="team-comments" className="border-t pt-6">
+              </div> */}
+              <div id="team-comments">
                 <h4 className="text-lg font-medium mb-4">팀원 의견</h4>
                 <div className="space-y-4">
                   {reviews.map((review) => (
-                    <div className="bg-gray-50 p-4 rounded-lg">
+                    <div key={review.id} className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium">{review.reviewer?.name}</span>
+                        <span className="font-medium">{review.reviewer.name}</span>
                         <div className="flex gap-2">
                           <button className="text-sm text-blue-600 hover:text-blue-800">수정</button>
                           <button className="text-sm text-red-600 hover:text-red-800">삭제</button>
@@ -317,7 +316,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                       <p className="text-sm text-gray-700">{review.content}</p>
                     </div>
                   ))}
-                  <ReviewsForm className="mt-4" method="POST">
+                  <ReviewsForm className="mt-4" method="POST" action="./reviews">
                     <textarea className="w-full rounded-md border-gray-300" rows={3} placeholder="의견을 입력하세요"></textarea>
                     <div className="mt-2 flex justify-end">
                       <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">의견 등록</button>

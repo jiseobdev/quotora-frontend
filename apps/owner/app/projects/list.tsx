@@ -50,8 +50,8 @@ async function fetchDashboard(token?: string) {
   return result;
 };
 
-async function fetchRfps(token?: string) {
-  const response = await fetch(new URL('/api/v1/orderer/rfps', process.env.BACKEND_API_URL), {
+async function fetchRfps(status: string, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps?status=${status}`, process.env.BACKEND_API_URL), {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -76,7 +76,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
   const dashboard = await fetchDashboard(token);
-  const rfps = await fetchRfps(token);
+  const rfps =
+    ([] as Rfp[])
+      .concat(...(await Promise.all(Object.keys(STATUS_TO_LABEL).map((status) => fetchRfps(status, token)))))
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return data({
     dashboard,
