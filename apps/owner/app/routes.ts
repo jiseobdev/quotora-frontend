@@ -21,6 +21,7 @@ export default [
       route('new', './rfps/new.tsx'),
       route(':id', './rfps/details.tsx'),
       route(':id/edit', './rfps/edit.tsx'),
+      route(':id/invite', './rfps/invite.tsx'),
       route(':id/comments', './rfps/comments.tsx'),
       route(':id/send', './rfps/send.tsx'),
       route(':id/finalize', './rfps/finalize.tsx'),

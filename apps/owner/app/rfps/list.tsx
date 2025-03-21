@@ -1,10 +1,34 @@
-import { data, Link, useFetcher, useLoaderData, useNavigate } from "react-router";
+import { data, Link, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData, useNavigate } from "react-router";
 import type { Route } from "./+types/list";
 import { fetchRfps } from "~/lib/fetch";
 import { getAccessToken } from "~/auth.server";
 import { STATUS_TO_CLASSNAME, STATUS_TO_LABEL } from "./constants";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
+import InviteModal from "./components/invite-modal";
+
+async function fetchColleagues(token?: string) {
+  const response = await fetch(new URL(`/api/v1/users/colleagues`, process.env.BACKEND_API_URL), {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: User[] = await response.json();
+
+  return result;
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -14,11 +38,13 @@ export async function loader({ request }: Route.LoaderArgs) {
       .concat(...(await Promise.all(Object.keys(STATUS_TO_LABEL).map((status) => fetchRfps(status, token)))))
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-  return data({ rfps });
+  const colleagues = await fetchColleagues(token);
+
+  return data({ rfps, colleagues });
 }
 
 export default function List() {
-  const { rfps = [] } = useLoaderData<typeof loader>();
+  const { rfps = [], colleagues = [] } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   const fetcher = useFetcher();
@@ -39,6 +65,12 @@ export default function List() {
       fetcher.load('.');
     }
   }, [fetcher]);
+
+  const [emails, setEmails] = useState<string[]>([]);
+
+  const [modalOpened, setModalOpened] = useState(false);
+  const openModal = () => setModalOpened(true);
+  const closeModal = () => setModalOpened(false);
 
   return (
     <main id="main" className="pt-24 px-6 pb-6 min-h-[calc(100vh-var(--spacing)*16)]">
@@ -66,6 +98,7 @@ export default function List() {
         <button
           className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
           disabled={selectedId === null}
+          onClick={openModal}
         >
           <i className="fa-solid fa-users mr-2"></i>
           Team Share
@@ -132,11 +165,12 @@ export default function List() {
         </table>
       </div>
       <div className="mt-6">
-        <Link to="./new" className="inline-block px-6 py-3 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] flex items-center">
+        <Link to="./new" className="inline-block px-6 py-3 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] items-center">
           <i className="fa-solid fa-plus mr-2"></i>
           Create New RFP
         </Link>
       </div>
+      <InviteModal id={selectedId} open={modalOpened} values={emails} colleagues={colleagues} onOpenChange={setModalOpened} onValuesChange={setEmails} />
     </main>
   );
 }
