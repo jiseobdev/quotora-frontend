@@ -3,6 +3,7 @@ import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { format } from "date-fns";
 import { fetchComments, fetchRfp } from "~/lib/fetch";
+import { useEffect } from "react";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -19,6 +20,12 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 export default function Details({ params: { id } }: Route.ComponentProps) {
   const { rfp, comments } = useLoaderData<typeof loader>();
   const commentsFetcher = useFetcher();
+
+  useEffect(() => {
+    if (commentsFetcher.state === "idle" && commentsFetcher.data?.success) {
+      commentsFetcher.load('.');
+    }
+  }, [commentsFetcher]);
 
   return (
     <div id="content" className="p-6">
