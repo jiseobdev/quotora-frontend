@@ -1,7 +1,7 @@
 import type { Route } from "./+types/new";
 import { redirect, UNSAFE_ErrorResponseImpl } from "react-router";
 import { getAccessToken } from "~/auth.server";
-import RfpForm from "./form";
+import RfpForm from "./components/form";
 
 export async function action({ request }: Route.ActionArgs) {
   const token = await getAccessToken(request);

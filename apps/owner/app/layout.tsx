@@ -8,7 +8,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const accessToken = await accessTokenCookie.parse(cookieHeader);
 
   if (!accessToken) {
-    // return redirect('/signin');
+    return redirect('/signin');
   }
 }
 

@@ -1,3 +1,11 @@
+interface User {
+  id: number;
+  name: string;
+  profileImage: string;
+  email: string;
+  createdAt: string;
+}
+
 interface Rfp {
   id: number;
   name: string;
@@ -41,4 +49,18 @@ interface Review {
   content: string;
   reviewer: { name: string };
   createdAt: string;
+}
+
+interface Comment {
+  id: number;
+  targetFieldName: "NAME" | "EXPECTED_SCHEDULE" | "OVERVIEW" | "DESIRED_LEGAL_ADVICE" | "SPECIAL_REQUIREMENTS" | "SUBMISSION_DEADLINE" | "SELECTION_NOTIFICATION_DATE" | "IS_ORAL_PRESENTATION" | "SELECTION_CRITERIA" | "RAW_FIRMS";
+  content: string;
+  user: User;
+  createdAt: string;
+  replies: {
+    id: number;
+    content: string;
+    user: User;
+    createdAt: string;
+  }[];
 }
