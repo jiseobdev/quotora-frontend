@@ -20,8 +20,10 @@ export default [
       index('./rfps/list.tsx'),
       route('new', './rfps/new.tsx'),
       route(':id', './rfps/details.tsx'),
+      route(':id/edit', './rfps/edit.tsx'),
       route(':id/comments', './rfps/comments.tsx'),
       route(':id/send', './rfps/send.tsx'),
+      route(':id/finalize', './rfps/finalize.tsx'),
     ]),
   ]),
 ] satisfies RouteConfig;

@@ -1,9 +1,10 @@
-import { data, Link, useLoaderData } from "react-router";
+import { data, Link, useFetcher, useLoaderData, useNavigate } from "react-router";
 import type { Route } from "./+types/list";
 import { fetchRfps } from "~/lib/fetch";
 import { getAccessToken } from "~/auth.server";
 import { STATUS_TO_CLASSNAME, STATUS_TO_LABEL } from "./constants";
 import { format } from "date-fns";
+import { useEffect, useState } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -18,23 +19,58 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function List() {
   const { rfps = [] } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
+
+  const fetcher = useFetcher();
+
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedId(prevId => (prevId === id ? null : id));
+  };
+
+  const finalizeSelected = () => {
+    fetcher.submit({ id: selectedId }, { method: 'post', action: `./${selectedId}/finalize` })
+    setSelectedId(null);
+  };
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data?.success) {
+      fetcher.load('.');
+    }
+  }, [fetcher]);
 
   return (
     <main id="main" className="pt-24 px-6 pb-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="flex space-x-4 mb-6">
-        <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] flex items-center">
+        <button
+          className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
+          disabled={selectedId === null}
+          onClick={() => navigate(`./${selectedId}/edit`)}
+        >
           <i className="fa-solid fa-pen-to-square mr-2"></i>
           Edit
         </button>
-        <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] flex items-center">
+        <button
+          className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
+          disabled={selectedId === null}
+          onClick={finalizeSelected}
+        >
           <i className="fa-solid fa-check-circle mr-2"></i>
           Finalize
         </button>
-        <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] flex items-center">
+        <button
+          className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
+          disabled={selectedId === null}
+        >
           <i className="fa-solid fa-users mr-2"></i>
           Team Share
         </button>
-        <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] flex items-center">
+        <button
+          className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
+          disabled={selectedId === null}
+          onClick={() => navigate(`./${selectedId}/send`)}
+        >
           <i className="fa-solid fa-paper-plane mr-2"></i>
           Send RFP
         </button>
@@ -56,7 +92,7 @@ export default function List() {
             {rfps.map((rfp) => (
               <tr key={rfp.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4">
-                  <input type="checkbox" className="rounded text-[#4F46E5]" />
+                  <input type="checkbox" className="rounded text-[#4F46E5]" checked={selectedId === rfp.id} onChange={() => handleCheckboxChange(rfp.id)} />
                 </td>
                 <td className="px-6 py-4">
                   <Link to={`./${rfp.id}`}>{rfp.name}</Link>
