@@ -29,8 +29,8 @@ export default function List() {
     setSelectedId(prevId => (prevId === id ? null : id));
   };
 
-  const finalizeSelected = () => {
-    fetcher.submit({ id: selectedId }, { method: 'post', action: `./${selectedId}/finalize` })
+  const finalize = (id: number) => {
+    fetcher.submit({ id }, { method: 'post', action: `./${id}/finalize` })
     setSelectedId(null);
   };
 
@@ -54,7 +54,11 @@ export default function List() {
         <button
           className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
           disabled={selectedId === null}
-          onClick={finalizeSelected}
+          onClick={() => {
+            if (selectedId !== null) {
+              finalize(selectedId)
+            }
+          }}
         >
           <i className="fa-solid fa-check-circle mr-2"></i>
           Finalize
@@ -111,8 +115,8 @@ export default function List() {
                   <div className="flex space-x-2">
                     {rfp.status === "WRITING" && (
                       <>
-                        <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-pen"></i></button>
-                        <button className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-check"></i></button>
+                        <Link to={`./${rfp.id}/edit`} className="text-gray-400 hover:text-[#4F46E5]"><i className="fa-solid fa-pen"></i></Link>
+                        <button className="text-gray-400 hover:text-[#4F46E5]" onClick={() => finalize(rfp.id)}><i className="fa-solid fa-check"></i></button>
                       </>
                     )}
                     {rfp.status === "WRITTEN" && (
