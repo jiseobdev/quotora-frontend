@@ -26,4 +26,6 @@ COPY --from=build-env /app/build /app/build
 COPY --from=build-env /app/public /app/public
 COPY --from=build-env /app/package.json /app
 WORKDIR /app
+USER node
+EXPOSE 3000
 CMD ["npm", "run", "start"]
