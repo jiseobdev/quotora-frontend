@@ -1,52 +1,8 @@
-import { data, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
+import { data, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { format } from "date-fns";
-
-async function fetchRfp(id: string, token?: string) {
-  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}`, process.env.BACKEND_API_URL), {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-
-  if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
-  }
-
-  const result: Rfp = await response.json();
-
-  return result;
-}
-
-async function fetchComments(id: string, token?: string) {
-  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/comments`, process.env.BACKEND_API_URL), {
-
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-
-  if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
-  }
-
-  const result: Comment[] = await response.json();
-
-  return result;
-}
+import { fetchComments, fetchRfp } from "~/lib/fetch";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -62,6 +18,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 
 export default function Details({ params: { id } }: Route.ComponentProps) {
   const { rfp, comments } = useLoaderData<typeof loader>();
+  const commentsFetcher = useFetcher();
 
   return (
     <div id="content" className="p-6">
@@ -140,9 +97,16 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             </div>
             <p className="text-gray-700">{comment.content}</p>
             <div className="flex items-center mt-2 space-x-4">
-              <button className="text-sm text-gray-600 hover:text-gray-800">답글</button>
-              <button className="text-sm text-gray-600 hover:text-gray-800">수정</button>
-              <button className="text-sm text-gray-600 hover:text-gray-800">삭제</button>
+              {/* <button className="text-sm text-gray-600 hover:text-gray-800">답글</button> */}
+              {/* <button className="text-sm text-gray-600 hover:text-gray-800">수정</button> */}
+              <button
+                className="text-sm text-gray-600 hover:text-gray-800"
+                onClick={() => {
+                  commentsFetcher.submit({ id: comment.id }, { method: 'delete' });
+                }}
+              >
+                삭제
+              </button>
             </div>
           </div>
         ))}

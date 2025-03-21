@@ -2,6 +2,7 @@ import { data, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { differenceInCalendarDays } from "date-fns";
+import { fetchRfp } from "~/lib/fetch";
 
 function getDDay(targetDate: Date): string {
   const today = new Date();
@@ -14,28 +15,6 @@ function getDDay(targetDate: Date): string {
   } else {
     return `D+${Math.abs(diff)}`;
   }
-}
-
-async function fetchRfp(id: string, token?: string) {
-  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}`, process.env.BACKEND_API_URL), {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-
-  if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
-  }
-
-  const result: Rfp = await response.json();
-
-  return result;
 }
 
 async function fetchProposals(id: string, token?: string) {

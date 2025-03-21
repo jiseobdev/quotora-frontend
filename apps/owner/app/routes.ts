@@ -20,6 +20,7 @@ export default [
       index('./rfps/list.tsx'),
       route('new', './rfps/new.tsx'),
       route(':id', './rfps/details.tsx'),
+      route(':id/comments', './rfps/comments.tsx'),
       route(':id/send', './rfps/send.tsx'),
     ]),
   ]),
