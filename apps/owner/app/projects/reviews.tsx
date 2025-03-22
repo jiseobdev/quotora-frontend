@@ -55,5 +55,5 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
     );
   }
 
-  return data({ ok: true });
+  return data({ success: true });
 }

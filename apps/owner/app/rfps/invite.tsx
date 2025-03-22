@@ -10,7 +10,6 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
   const permission = formData.get('permission');
 
   const body = { emails, permission };
-  console.log(body)
 
   const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/invite`, process.env.BACKEND_API_URL), {
     method: 'POST',

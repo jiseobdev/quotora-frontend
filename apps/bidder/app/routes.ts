@@ -13,6 +13,7 @@ export default [
     ...prefix('projects', [
       index('./projects/list.tsx'),
       route(':id', './projects/details.tsx'),
+      route(':id/nda', './projects/nda.tsx'),
       route(':id/rfp', './projects/rfp.tsx'),
     ]),
 
