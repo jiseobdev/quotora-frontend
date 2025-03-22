@@ -22,11 +22,9 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             <h3 className="text-sm font-medium text-gray-500 mb-3">공지사항</h3>
             <div className="space-y-3">
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <i className="text-[#4F46E5] mr-2 fa-solid fa-car-side"></i>
                 <span>사무실 주차안내, 사무실 주소는 서울시 역삼동 아린 빌딩. 지하 3층에 세우시고 올라오시면 주차 등록해드립니다</span>
               </div>
               <div className="bg-white p-4 rounded-lg shadow-sm">
-                <i className="text-[#4F46E5] mr-2 fa-solid fa-clock-rotate-left"></i>
                 <span>입찰마감일을 일주일 연장하였습니다</span>
               </div>
             </div>

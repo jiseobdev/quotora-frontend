@@ -3,6 +3,7 @@ import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { differenceInCalendarDays } from "date-fns";
 import { fetchRfp } from "~/lib/fetch";
+import { useEffect, useRef } from "react";
 
 function getDDay(targetDate: Date): string {
   const today = new Date();
@@ -39,6 +40,28 @@ async function fetchProposals(id: string, token?: string) {
   return result;
 }
 
+async function fetchNotices(id: string, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/notices`, process.env.BACKEND_API_URL), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: Notice[] = await response.json();
+
+  return result;
+}
+
 async function fetchReviews(id: string, token?: string) {
   const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/reviews`, process.env.BACKEND_API_URL), {
 
@@ -67,11 +90,13 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 
   const rfp = await fetchRfp(id, token);
   const proposals = await fetchProposals(id, token);
+  const notices = await fetchNotices(id, token);
   const reviews = await fetchReviews(id, token);
 
   return data({
     rfp,
     proposals,
+    notices,
     reviews,
   });
 }
@@ -79,13 +104,23 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 export default function Details({ params: { id } }: Route.ComponentProps) {
   const loaderData = useLoaderData<typeof loader>();
   const { data: reviewsData, Form: ReviewsForm } = useFetcher<{ reviews: Review[] }>();
+  const { data: noticesData, Form: NoticesForm } = useFetcher<{ notices: Notice[] }>();
 
   const { rfp, proposals } = loaderData;
+  const notices = noticesData?.notices ?? loaderData.notices;
   const reviews = reviewsData?.reviews ?? loaderData.reviews;
 
   const proposalsByRawfirms = Object.fromEntries(
     rfp.rawfirms.map((firmName) => ([firmName, proposals.find((proposal) => proposal.lawfirmName === firmName)]))
   );
+
+  const noticesFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (noticesFormRef.current) {
+      noticesFormRef.current.reset();
+    }
+  }, [noticesData]);
 
   return (
     <main className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
@@ -104,10 +139,22 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
               </div>
             </div>
           </div>
-          <div className="mt-6 flex gap-4">
-            <input type="text" className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="일자 변경, 사무실 위치 및 주차 안내 등 공지사항 등 기재" />
-            <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">공지올리기</button>
-          </div>
+          <NoticesForm action="./notices" method="POST" ref={noticesFormRef} className="mt-6 flex flex-col gap-4">
+            {notices.length > 0 && (
+              <div className="-mx-6 p-6 border-y border-gray-200 bg-gray-50">
+                <h3 className="text-sm font-medium text-gray-500 mb-3">공지사항</h3>
+                <div className="space-y-3">
+                  {notices.map((notice, index) => (
+                    <div key={index} className="bg-white p-4 rounded-lg shadow-sm">
+                      <span>{notice.content}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <input type="text" name="content" className="flex-1 px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="일자 변경, 사무실 위치 및 주차 안내 등 공지사항 등 기재" />
+            <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">공지 올리기</button>
+          </NoticesForm>
         </div>
         <div id="bid-management" className="mt-8">
           <h2 className="text-xl font-semibold mb-6">입찰 절차 관리</h2>
@@ -184,7 +231,13 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                     <p className="text-sm text-gray-900">프로젝트 리더는 15년 경력의 파트너 변호사가 담당하며, 실무진은 5년 이상 경력의 변호사 2인으로 구성됩니다.</p>
                   </div>
                 </div>
-                <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">추가 답변하기</button>
+                <div className="space-y-3">
+                  <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="메모 또는 코멘트를 입력하세요"></textarea>
+                  <div className="flex gap-2">
+                    {/* <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button> */}
+                    <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">전송하기</button>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="bg-white rounded-lg shadow-sm p-4">
@@ -192,9 +245,9 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 <h3 className="text-lg font-medium">법무법인 광장 커뮤니케이션</h3>
               </div>
               <div className="space-y-3">
-                <textarea className="w-full rounded-md border-gray-300" rows={2} placeholder="메모 또는 코멘트를 입력하세요"></textarea>
+                <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="메모 또는 코멘트를 입력하세요"></textarea>
                 <div className="flex gap-2">
-                  <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button>
+                  {/* <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button> */}
                   <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">전송하기</button>
                 </div>
               </div>
@@ -209,7 +262,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 <span className="font-medium">선정기준:</span>
                 <span className="ml-2">{rfp.selectionCriteria.map((criteria) => `${criteria.name} ${criteria.weight}%`).join(' | ')}</span>
               </div>
-              <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">제안서 분석하기</button>
+              {/* <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">제안서 분석하기</button> */}
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-6">

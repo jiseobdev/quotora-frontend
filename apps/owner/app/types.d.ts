@@ -44,6 +44,11 @@ interface Proposal {
   sentAt: string;
 }
 
+interface Notice {
+  content: string;
+  createdAt: string;
+}
+
 interface Review {
   id: number;
   content: string;
