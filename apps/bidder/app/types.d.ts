@@ -1,3 +1,21 @@
+interface Rfp {
+  id: number;
+  name: string;
+  overview: string;
+  desiredLegalAdvice: string;
+  specialRequirements: string;
+  expectedSchedule: string;
+  submissionDeadline: string;
+  selectionNotificationDate: string;
+  oralPresentation: boolean;
+  rawfirms: string[];
+  selectionCriteria: { name: string; weight: number; }[];
+  estimatedCost: number;
+  status: "WRITING" | "WRITTEN" | "BIDDING" | "CLOSED";
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface Proposal {
   id: number;
   lawfirmName: string;

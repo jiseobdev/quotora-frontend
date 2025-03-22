@@ -1,15 +1,16 @@
 import { data, Form, Link, replace, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import type { Route } from "./+types/nda";
 import { getAccessToken } from "~/auth.server";
-import { fetchProposal } from "~/lib/fetch";
+import { fetchProposal, fetchRfp } from "~/lib/fetch";
 import { format } from "date-fns";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
   const proposal = await fetchProposal(id, token);
+  const rfp = await fetchRfp(proposal.rfpId, token);
 
-  return data({ proposal });
+  return data({ proposal, rfp });
 }
 
 export async function action({ request, params: { id } }: Route.ActionArgs) {
@@ -36,7 +37,7 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 }
 
 export default function Nda() {
-  const { proposal } = useLoaderData<typeof loader>();
+  const { proposal, rfp } = useLoaderData<typeof loader>();
 
   return (
     <main className="px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-var(--spacing)*16)]">
@@ -52,11 +53,11 @@ export default function Nda() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">입찰마감일</p>
-                <p className="text-sm font-medium">2025.03.01</p>
+                <p className="text-sm font-medium">{format(new Date(rfp.submissionDeadline), 'yyyy.MM.dd')}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">낙찰통보 예정일</p>
-                <p className="text-sm font-medium">2025.03.15</p>
+                <p className="text-sm font-medium">{format(new Date(rfp.selectionNotificationDate), 'yyyy.MM.dd')}</p>
               </div>
             </div>
           </div>
