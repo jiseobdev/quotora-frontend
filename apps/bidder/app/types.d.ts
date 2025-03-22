@@ -1,3 +1,10 @@
+interface User {
+  id: number;
+  name: string;
+  profileImage: string;
+  email: string;
+  createdAt: string;
+}
 interface Rfp {
   id: number;
   name: string;
@@ -14,6 +21,26 @@ interface Rfp {
   status: "WRITING" | "WRITTEN" | "BIDDING" | "CLOSED";
   createdAt: string;
   updatedAt: string;
+}
+
+interface Notice {
+  content: string;
+  createdAt: string;
+}
+
+interface QnA {
+  question: {
+    id: number;
+    content: string;
+    user: User;
+    createdAt: string;
+  };
+  answer: {
+    id: number;
+    content: string;
+    user: User;
+    createdAt: string;
+  };
 }
 
 interface Proposal {

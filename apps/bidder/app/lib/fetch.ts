@@ -87,3 +87,48 @@ export async function fetchRfp(id: string | number, token?: string) {
 
   return result;
 }
+
+export async function fetchNotices(id: string | number, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/notices`, process.env.BACKEND_API_URL), {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: Notice[] = await response.json();
+
+  return result;
+}
+
+export async function fetchQnas(id: string | number, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/qnas`, process.env.BACKEND_API_URL), {
+
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  if (!response.ok) {
+    throw new UNSAFE_ErrorResponseImpl(
+      response.status,
+      response.statusText,
+      null,
+    );
+  }
+
+  const result: QnA[] = await response.json();
+
+  return result;
+}

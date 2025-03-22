@@ -152,7 +152,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 </div>
               </div>
             )}
-            <input type="text" name="content" className="flex-1 px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="일자 변경, 사무실 위치 및 주차 안내 등 공지사항 등 기재" />
+            <input type="text" name="content" className="flex-1 px-4 py-2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="일자 변경, 사무실 위치 및 주차 안내 등 공지사항 등 기재" />
             <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">공지 올리기</button>
           </NoticesForm>
         </div>
@@ -232,7 +232,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="메모 또는 코멘트를 입력하세요"></textarea>
+                  <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="질문을 입력하세요"></textarea>
                   <div className="flex gap-2">
                     {/* <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button> */}
                     <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">전송하기</button>
@@ -245,7 +245,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                 <h3 className="text-lg font-medium">법무법인 광장 커뮤니케이션</h3>
               </div>
               <div className="space-y-3">
-                <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="메모 또는 코멘트를 입력하세요"></textarea>
+                <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="질문을 입력하세요"></textarea>
                 <div className="flex gap-2">
                   {/* <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button> */}
                   <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">전송하기</button>
@@ -304,7 +304,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                     </div>
                   ))}
                   <ReviewsForm className="mt-4" method="POST" action="./reviews">
-                    <textarea className="w-full rounded-md border-gray-300" rows={3} placeholder="의견을 입력하세요"></textarea>
+                    <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={3} placeholder="의견을 입력하세요"></textarea>
                     <div className="mt-2 flex justify-end">
                       <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">의견 등록</button>
                     </div>

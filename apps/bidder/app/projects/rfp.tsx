@@ -4,6 +4,7 @@ import { fetchProposal, fetchRfp } from "~/lib/fetch";
 import { data, Form, replace, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import { differenceInCalendarDays } from "date-fns";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from "~/components/ui/alert-dialog";
+import { getDDay } from "~/lib/date";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -40,19 +41,6 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
   return replace(request.method === 'POST' ? `/projects/${id}` : '/projects');
 }
 
-function getDDay(targetDate: Date): string {
-  const today = new Date();
-  const diff = differenceInCalendarDays(targetDate, today);
-
-  if (diff > 0) {
-    return `D-${diff}`;
-  } else if (diff === 0) {
-    return 'D-Day';
-  } else {
-    return `D+${Math.abs(diff)}`;
-  }
-}
-
 export default function Rfp() {
   const { proposal, rfp } = useLoaderData<typeof loader>();
 
@@ -70,7 +58,7 @@ export default function Rfp() {
                 </div>
                 <div className="flex items-center">
                   <i className="text-[#4F46E5] mr-2 fa-solid fa-calendar"></i>
-                  <span className="text-sm">확정통보: {getDDay(new Date(rfp.selectionNotificationDate))}</span>
+                  <span className="text-sm">확정 통보: {getDDay(new Date(rfp.selectionNotificationDate))}</span>
                 </div>
               </div>
             </div>

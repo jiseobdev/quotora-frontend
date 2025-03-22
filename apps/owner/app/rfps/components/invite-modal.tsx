@@ -26,8 +26,6 @@ export default function InviteModal({ id, open, values, colleagues, onOpenChange
 
     if (!permission) return;
 
-    console.log({ emails: values, permission })
-
     await fetcher.submit({ emails: values, permission }, { action: `/rfps/${id}/invite`, method: "POST" });
     onOpenChange(false);
   };

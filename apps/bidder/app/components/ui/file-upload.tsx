@@ -299,19 +299,18 @@ export const FileUploaderItem = forwardRef<
       )}
       {...props}
     >
-      <div className="font-medium leading-none tracking-tight flex items-center gap-1.5 h-full w-full">
-        {children}
-      </div>
+      {children}
       <button
         type="button"
         className={cn(
-          "absolute",
+          "text-gray-400 hover:text-gray-500",
           direction === "rtl" ? "top-1 left-1" : "top-1 right-1",
         )}
         onClick={() => removeFileFromSet(index)}
       >
         <span className="sr-only">remove item {index}</span>
-        <RemoveIcon className="w-4 h-4 hover:stroke-destructive duration-200 ease-in-out" />
+        <i className="fa-solid fa-trash-can"></i>
+        {/* <RemoveIcon className="w-4 h-4 hover:stroke-destructive duration-200 ease-in-out" /> */}
       </button>
     </div>
   );
@@ -349,6 +348,7 @@ export const FileInput = forwardRef<
       </div>
       <Input
         ref={dropzoneState.inputRef}
+        name="file"
         disabled={isLOF}
         {...dropzoneState.getInputProps()}
         className={`${isLOF ? "cursor-not-allowed" : ""}`}
