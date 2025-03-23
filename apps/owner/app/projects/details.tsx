@@ -1,9 +1,10 @@
 import { data, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
-import { differenceInCalendarDays } from "date-fns";
+import { differenceInCalendarDays, format } from "date-fns";
 import { fetchQnas, fetchRfp } from "~/lib/fetch";
 import { useEffect, useRef } from "react";
+import clsx from "clsx";
 
 function getDDay(targetDate: Date): string {
   const today = new Date();
@@ -86,10 +87,14 @@ async function fetchReviews(id: string, token?: string) {
 }
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
-  const payloadBase64 = token.split('.')[1];
-  const payload = Buffer.from(payloadBase64, 'base64url').toString('utf-8');
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const payload = Buffer.from(payloadBase64, 'base64url').toString('utf-8');
 
-  return JSON.parse(payload);
+    return JSON.parse(payload);
+  } catch (error) {
+    return {};
+  }
 }
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
@@ -99,7 +104,9 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const proposals = await fetchProposals(id, token);
   const notices = await fetchNotices(id, token);
   const reviews = await fetchReviews(id, token);
-  const qnas = await fetchQnas(id, token);
+
+  const qnaLists = await Promise.all(proposals.map((proposal) => fetchQnas(id, proposal.id.toString(), token)));
+  const qnas = Object.fromEntries(proposals.map((proposal, index) => [proposal.id.toString(), qnaLists[index]]));
 
   return data({
     user: { id: decodeJwtPayload(token).userId },
@@ -115,16 +122,11 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
   const loaderData = useLoaderData<typeof loader>();
   const { data: reviewsData, Form: ReviewsForm, submit: submitReview } = useFetcher<{ reviews: Review[] }>();
   const { data: noticesData, Form: NoticesForm } = useFetcher<{ notices: Notice[] }>();
-  const { data: qnasData, Form: QnAsForm } = useFetcher<{ qnas: QnA[] }>();
+  const { data: qnasData, Form: QnAsForm } = useFetcher<{ success: boolean; proposalId: string | number; }>();
 
-  const { user, rfp, proposals } = loaderData;
+  const { user, rfp, proposals, qnas } = loaderData;
   const notices = noticesData?.notices ?? loaderData.notices;
   const reviews = reviewsData?.reviews ?? loaderData.reviews;
-  const qnas = qnasData?.qnas ?? loaderData.qnas;
-
-  const proposalsByRawfirms = Object.fromEntries(
-    rfp.rawfirms.map((firmName) => ([firmName, proposals.find((proposal) => proposal.lawfirmName === firmName)]))
-  );
 
   const noticesFormRef = useRef<HTMLFormElement>(null);
 
@@ -141,6 +143,14 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
       reviewsFormRef.current.reset();
     }
   }, [reviewsData]);
+
+  const qnaFormRefs = useRef<Record<string, HTMLFormElement | null>>({});
+
+  useEffect(() => {
+    if (qnasData?.proposalId && qnaFormRefs.current[qnasData.proposalId.toString()]) {
+      qnaFormRefs.current[qnasData.proposalId.toString()]?.reset();
+    }
+  }, [qnasData]);
 
   return (
     <main className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
@@ -182,46 +192,46 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">로펌명</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">NDA동의 &amp; 응찰여부</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">제안서</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">상태</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">선정여부</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">메시지</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">로펌명</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">NDA동의 &amp; 응찰여부</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">제안서</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">선정여부</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">메시지</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {rfp.rawfirms.map((firm) => (
-                  <tr key={firm}>
-                    <td className="px-4 py-4">{firm}</td>
-                    <td className="px-4 py-4">
-                      {proposalsByRawfirms[firm]?.nda ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
+                {proposals.map((proposal) => (
+                  <tr key={proposal.id}>
+                    <td className="px-4 py-4">{proposal.lawfirmName}</td>
+                    <td className="px-4 py-4 text-center">
+                      {proposal.nda ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
                       /
-                      {proposalsByRawfirms[firm]?.participate ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
+                      {proposal.participate ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
                     </td>
-                    {proposalsByRawfirms[firm]?.nda && proposalsByRawfirms[firm]?.participate ?
+                    {proposal.nda && proposal.participate ?
                       (<>
-                        <td className="px-4 py-4">
-                          {(proposalsByRawfirms[firm]?.files.length ?? 0) > 0 ? (<span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">제출완료</span>) : (<span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">미제출</span>)}
+                        <td className="px-4 py-4 text-center">
+                          {(proposal.files.length ?? 0) > 0 ? (<span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">제출완료</span>) : (<span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">미제출</span>)}
                         </td>
-                        <td className="px-4 py-4"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{proposalsByRawfirms[firm]?.status}</span></td>
-                        <td className="px-4 py-4">
+                        <td className="px-4 py-4 text-center"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{proposal.status}</span></td>
+                        <td className="px-4 py-4 text-center">
                           <div className="flex gap-2">
                             <button className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600">Y</button>
                             <button className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600">N</button>
                           </div>
                         </td>
-                        <td className="px-4 py-4">
-                          <button className="px-3 py-1 text-xs bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">
+                        <td className="px-4 py-4 text-center">
+                          <button className="px-3 py-1 text-xs bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400" disabled>
                             <i className="fa-solid fa-message mr-1"></i>연락하기
                           </button>
                         </td>
                       </>) :
                       (<>
-                        <td className="px-4 py-4">-</td>
-                        <td className="px-4 py-4">-</td>
-                        <td className="px-4 py-4">-</td>
-                        <td className="px-4 py-4">-</td>
+                        <td className="px-4 py-4 text-center">-</td>
+                        <td className="px-4 py-4 text-center">-</td>
+                        <td className="px-4 py-4 text-center">-</td>
+                        <td className="px-4 py-4 text-center">-</td>
                       </>)
                     }
                   </tr>
@@ -230,48 +240,54 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             </table>
           </div>
           <div id="communication-section" className="mt-6 space-y-4">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">김&amp;장 커뮤니케이션</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex flex-col space-y-3">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs text-blue-600">입찰자 질의 (2025.01.15)</span>
-                      <i className="fa-solid fa-arrow-right text-blue-600"></i>
+            {proposals.filter((proposal) => proposal.nda && proposal.participate).map((proposal) => (
+              <div key={proposal.id} className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium">{proposal.lawfirmName} 커뮤니케이션</h3>
+                </div>
+                <div className="space-y-4">
+                  {qnas[proposal.id].map((qna) => (
+                    <div key={qna.question.id} className="flex flex-col space-y-3">
+                      <div className={clsx('p-4 rounded-lg', qna.question.user.companyName === proposal.ordererName ? 'bg-blue-50 ml-6' : 'bg-gray-50 mr-6')}>
+                        <div className={clsx('flex justify-between items-center mb-2', qna.question.user.companyName === proposal.ordererName ? 'text-blue-600' : 'text-gray-600')}>
+                          <span className="text-xs">
+                            {qna.question.user.companyName === proposal.ordererName ? '발주자' : '입찰자'} 질의 ({format(new Date(qna.question.createdAt), 'yyyy.MM.dd')})
+                          </span>
+                          <i className={clsx('fa-solid', qna.question.user.companyName === proposal.ordererName ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
+                        </div>
+                        <p className="text-sm text-gray-700">{qna.question.content}</p>
+                      </div>
+                      {qna.answer && (
+                        <div className={clsx('p-4 rounded-lg', qna.answer.user.companyName === proposal.ordererName ? 'bg-blue-50 ml-6' : 'bg-gray-50 mr-6')}>
+                          <div className={clsx('flex justify-between items-center mb-2', qna.answer.user.companyName === proposal.ordererName ? 'text-blue-600' : 'text-gray-600')}>
+                            <span className="text-xs">답변 완료 ({format(new Date(qna.answer.createdAt), 'yyyy.MM.dd')})</span>
+                            <i className={clsx('fa-solid', qna.answer.user.companyName === proposal.ordererName ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
+                          </div>
+                          <p className="text-sm text-gray-900">{qna.answer.content}</p>
+                        </div>
+                      )}
+                      {!qna.answer && qna.question.user.companyName !== proposal.ordererName && (
+                        <QnAsForm action={`./proposals/${proposal.id}/qnas`} method="POST" className="flex gap-2 ml-6">
+                          <input name="questionId" type="hidden" value={qna.question.id} />
+                          <input name="content" type="text" className="flex-grow rounded-lg px-4 py-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="답변을 입력하세요" />
+                          <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg">
+                            <i className="fa-regular fa-paper-plane"></i>
+                          </button>
+                        </QnAsForm>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-700">프로젝트 수행 인력 구성에 대해 추가 문의드립니다.</p>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg ml-6">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs text-gray-600">답변 완료 (2025.01.16)</span>
-                      <i className="fa-solid fa-arrow-left text-gray-600"></i>
+                  ))}
+                  <QnAsForm action={`./proposals/${proposal.id}/qnas`} method="POST" ref={(el) => { qnaFormRefs.current[proposal.id.toString()] = el; }} className="space-y-3">
+                    <textarea name="content" className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="질문을 입력하세요"></textarea>
+                    <div className="flex justify-end">
+                      <button type="submit" className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">
+                        전송하기
+                      </button>
                     </div>
-                    <p className="text-sm text-gray-900">프로젝트 리더는 15년 경력의 파트너 변호사가 담당하며, 실무진은 5년 이상 경력의 변호사 2인으로 구성됩니다.</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="질문을 입력하세요"></textarea>
-                  <div className="flex gap-2">
-                    {/* <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button> */}
-                    <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">전송하기</button>
-                  </div>
+                  </QnAsForm>
                 </div>
               </div>
-            </div>
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium">법무법인 광장 커뮤니케이션</h3>
-              </div>
-              <div className="space-y-3">
-                <textarea className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="질문을 입력하세요"></textarea>
-                <div className="flex gap-2">
-                  {/* <button className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">임시 저장</button> */}
-                  <button className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">전송하기</button>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
         <div id="proposal-review" className="mt-8">

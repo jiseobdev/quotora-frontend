@@ -3,9 +3,11 @@ interface User {
   name: string;
   position: string;
   profileImage: string;
+  companyName: string;
   email: string;
   createdAt: string;
 }
+
 interface Rfp {
   id: number;
   name: string;
