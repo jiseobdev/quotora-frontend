@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { NavLink, Outlet, redirect } from "react-router";
+import { Link, NavLink, Outlet, redirect, useLocation } from "react-router";
 import type { Route } from "./+types/layout";
 import { accessTokenCookie } from "./auth.server";
 
@@ -13,6 +13,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function Layout() {
+  const location = useLocation();
+
+  const isSettingsActive = location.pathname.startsWith('/settings');
+
   return (
     <div className="flex h-full bg-gray-50">
       <div id="sidebar" className="hidden md:flex md:w-64 md:flex-col fixed h-full">
@@ -38,10 +42,39 @@ export default function Layout() {
                 <i className="fa-solid fa-book w-8 text-center"></i>
                 <span>Library</span>
               </a>
-              <a href="#" className="hover:bg-gray-50 group flex items-center px-2 py-3 text-sm font-medium rounded-md text-gray-400 cursor-not-allowed">
+              <NavLink to="/settings" className={({ isActive }) => clsx("group flex items-center px-2 py-3 text-sm font-medium rounded-md", isActive ? 'bg-[#D6D2F2] text-[#4F46E5]' : 'text-[#303A52] hover:bg-gray-50')}>
                 <i className="fa-solid fa-gear w-8 text-center"></i>
                 <span>Settings</span>
-              </a>
+              </NavLink>
+              {isSettingsActive && (
+                <div className="pl-4">
+                  <NavLink
+                    to="/settings/account"
+                    className={({ isActive }) => clsx("block px-6 py-2 text-sm font-medium text-[#4F46E5] cursor-pointer", isActive ? 'text-[#4F46E5] bg-[#F9FAFB]' : 'text-[#6C757D] hover:bg-[#F9FAFB] cursor-pointer')}
+                  >
+                    Account
+                  </NavLink>
+                  {/* <span className="block px-6 py-2 text-[#6C757D] hover:bg-[#F9FAFB] cursor-pointer">Favorite Advisors</span> */}
+                  <NavLink
+                    to="/settings/team"
+                    className={({ isActive }) => clsx("block px-6 py-2 text-sm font-medium text-[#4F46E5] cursor-pointer", isActive ? 'text-[#4F46E5] bg-[#F9FAFB]' : 'text-[#6C757D] hover:bg-[#F9FAFB] cursor-pointer')}
+                  >
+                    Team
+                  </NavLink>
+                  <a
+                    href="mailto:support@quotora.xyz"
+                    className="block px-6 py-2 text-sm font-medium text-[#6C757D] hover:bg-[#F9FAFB] cursor-pointer"
+                  >
+                    Contact Us
+                  </a>
+                  <a
+                    href="/signout"
+                    className="block px-6 py-2 text-sm font-medium text-[#6C757D] hover:bg-[#F9FAFB] cursor-pointer"
+                  >
+                    Sign Out
+                  </a>
+                </div>
+              )}
             </nav>
           </div>
         </div>

@@ -28,5 +28,11 @@ export default [
       route(':id/send', './rfps/send.tsx'),
       route(':id/finalize', './rfps/finalize.tsx'),
     ]),
+
+    ...prefix('settings', [
+      index('./settings/index.tsx'),
+      route('account', './settings/account.tsx'),
+      route('team', './settings/team.tsx'),
+    ]),
   ]),
 ] satisfies RouteConfig;
