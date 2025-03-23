@@ -23,7 +23,7 @@ RUN pnpm run build
 FROM node:20-alpine
 COPY --from=production-dependencies-env /app/pruned/node_modules /app/node_modules
 COPY --from=build-env /app/build /app/build
-COPY --from=build-env /app/public /app/public
+# COPY --from=build-env /app/public /app/public
 COPY --from=build-env /app/package.json /app
 WORKDIR /app
 USER node
