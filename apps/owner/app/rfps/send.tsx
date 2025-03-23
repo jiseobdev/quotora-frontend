@@ -108,8 +108,8 @@ export default function Send({ params: { id } }: Route.ComponentProps) {
                   <p>{rfp.name}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">예상일정</p>
-                  <p>{rfp.expectedSchedule}</p>
+                  <p className="text-sm font-medium text-gray-600">예상 일정</p>
+                  <p>{format(new Date(rfp.expectedSchedule), 'yyyy.MM.dd')} 까지</p>
                 </div>
               </div>
               <div>

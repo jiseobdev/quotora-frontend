@@ -51,8 +51,8 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
               <p className="text-gray-600">{rfp.name}</p>
             </div>
             <div className="text-right">
-              <h3 className="font-medium text-gray-900">예상일정</h3>
-              <p className="text-gray-600">{rfp.expectedSchedule}</p>
+              <h3 className="font-medium text-gray-900">예상 일정</h3>
+              <p className="text-gray-600">{format(new Date(rfp.expectedSchedule), 'yyyy.MM.dd')} 까지</p>
             </div>
           </div>
           <div>
