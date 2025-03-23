@@ -2,17 +2,17 @@ FROM node:20-alpine AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc /app/
-COPY apps/owner /app/apps/owner
+COPY apps/bidder /app/apps/bidder
 WORKDIR /app
 RUN corepack enable
 
 FROM base AS production-dependencies-env
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod
-RUN pnpm --filter owner --prod deploy pruned
+RUN pnpm --filter bidder --prod deploy pruned
 
 FROM base AS development-dependencies-env
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm --filter owner deploy pruned
+RUN pnpm --filter bidder deploy pruned
 
 FROM node:20-alpine AS build-env
 COPY --from=development-dependencies-env /app/pruned /app
