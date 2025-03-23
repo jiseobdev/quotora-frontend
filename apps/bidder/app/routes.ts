@@ -15,6 +15,7 @@ export default [
       route(':id', './projects/details.tsx'),
       route(':id/nda', './projects/nda.tsx'),
       route(':id/rfp', './projects/rfp.tsx'),
+      route(':id/qnas', './projects/qnas.tsx'),
     ]),
 
     ...prefix('proposals', [

@@ -110,8 +110,8 @@ export async function fetchNotices(id: string | number, token?: string) {
   return result;
 }
 
-export async function fetchQnas(id: string | number, token?: string) {
-  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/qnas`, process.env.BACKEND_API_URL), {
+export async function fetchQnas(id: string | number, proposalId: string | number, token?: string) {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/proposals/${proposalId}/qnas`, process.env.BACKEND_API_URL), {
 
     method: 'GET',
     headers: {

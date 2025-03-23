@@ -7,7 +7,7 @@ import { format, intlFormatDistance } from "date-fns";
 import clsx from "clsx";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "~/components/ui/file-upload";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -15,7 +15,8 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const proposal = await fetchProposal(id, token);
   const rfp = await fetchRfp(proposal.rfpId, token);
   const notices = await fetchNotices(proposal.rfpId, token);
-  const qnas = await fetchQnas(proposal.rfpId, token);
+
+  const qnas = await fetchQnas(proposal.rfpId, id, token);
 
   if (!proposal.nda || !proposal.participate) {
     return replace('/projects');
@@ -66,6 +67,7 @@ const MAX_FILES = 5;
 export default function Details() {
   const { proposal, rfp, notices, qnas } = useLoaderData<typeof loader>();
   const fetcher = useFetcher<typeof action>();
+  const { data: qnasData, Form: QnAsForm } = useFetcher<{ success: boolean }>();
 
   let step = 0;
   if (proposal.status === 'COMPLETED_BIDDING') {
@@ -87,6 +89,14 @@ export default function Details() {
       setFiles(null);
     }
   }, [fetcher]);
+
+  const qnasFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (qnasFormRef.current) {
+      qnasFormRef.current.reset();
+    }
+  }, [qnasData]);
 
   return (
     <main id="project-content" className="py-6">
@@ -200,48 +210,52 @@ export default function Details() {
               </div>
             </div>
           )}
-          {qnas.length > 0 && (
-            <div id="communication" className="p-6 border-b border-gray-200">
-              <h3 className="text-lg font-medium mb-4">발주사와 연락하기</h3>
-              <div className="flex flex-col gap-4">
-                {qnas.map((qna) => (
-                  <Form method="POST" key={qna.question.id} className="space-y-4">
-                    <div className="flex gap-4">
-                      <div className="flex-shrink-0">
-                        <img src={qna.question.user.profileImage} className="w-10 h-10 rounded-full" />
-                      </div>
-                      <div className="flex-grow bg-gray-50 rounded-lg p-4">
-                        <p className="text-sm">{qna.question.content}</p>
-                        <span className="text-xs text-gray-500">
-                          {qna.question.user.name} · {intlFormatDistance(new Date(qna.question.createdAt), new Date(), { locale: 'ko' })}
-                        </span>
-                      </div>
+          <div id="communication" className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-medium mb-4">발주사와 연락하기</h3>
+            <div className="flex flex-col gap-4">
+              {qnas.map((qna) => (
+                <div key={qna.question.id} className="flex flex-col space-y-3">
+                  <div className={clsx('p-4 rounded-lg', qna.question.user.companyName === proposal.ordererName ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
+                    <div className={clsx('flex justify-between items-center mb-2', qna.question.user.companyName === proposal.ordererName ? 'text-gray-600' : 'text-blue-600')}>
+                      <span className="text-xs">
+                        {qna.question.user.companyName === proposal.ordererName ? '발주자' : '입찰자'} 질의 ({format(new Date(qna.question.createdAt), 'yyyy.MM.dd')})
+                      </span>
+                      <i className={clsx('fa-solid', qna.question.user.companyName === proposal.ordererName ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
                     </div>
-                    {qna.answer ? (
-                      <div className="flex gap-4">
-                        <div className="flex-shrink-0">
-                          <img src={qna.answer.user.profileImage} className="w-10 h-10 rounded-full" />
-                        </div>
-                        <div className="flex-grow bg-gray-50 rounded-lg p-4">
-                          <p className="text-sm">{qna.answer.content}</p>
-                          <span className="text-xs text-gray-500">
-                            {qna.answer.user.name} · {intlFormatDistance(new Date(qna.answer.createdAt), new Date(), { locale: 'ko' })}
-                          </span>
-                        </div>
+                    <p className="text-sm text-gray-700">{qna.question.content}</p>
+                  </div>
+                  {qna.answer && (
+                    <div className={clsx('p-4 rounded-lg', qna.answer.user.companyName === proposal.ordererName ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
+                      <div className={clsx('flex justify-between items-center mb-2', qna.answer.user.companyName === proposal.ordererName ? 'text-gray-600' : 'text-blue-600')}>
+                        <span className="text-xs">답변 완료 ({format(new Date(qna.answer.createdAt), 'yyyy.MM.dd')})</span>
+                        <i className={clsx('fa-solid', qna.answer.user.companyName === proposal.ordererName ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
                       </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <input type="text" className="flex-grow rounded-lg px-4 py-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="메시지를 입력하세요..." />
-                        <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg">
-                          <i className="fa-regular fa-paper-plane"></i>
-                        </button>
-                      </div>
-                    )}
-                  </Form>
-                ))}
-              </div>
+                      <p className="text-sm text-gray-900">{qna.answer.content}</p>
+                    </div>
+                  )}
+                  {!qna.answer && qna.question.user.companyName !== proposal.lawfirmName && (
+                    <QnAsForm action="./qnas" method="POST" className="flex gap-2 ml-6">
+                      <input name="rfpId" type="hidden" value={rfp.id} />
+                      <input name="questionId" type="hidden" value={qna.question.id} />
+                      <input name="content" type="text" className="flex-grow rounded-lg px-4 py-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="답변을 입력하세요" />
+                      <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg">
+                        <i className="fa-regular fa-paper-plane"></i>
+                      </button>
+                    </QnAsForm>
+                  )}
+                </div>
+              ))}
+              <QnAsForm action="./qnas" method="POST" ref={qnasFormRef} className="space-y-3">
+                <input name="rfpId" type="hidden" value={rfp.id} />
+                <textarea name="content" className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={2} placeholder="질문을 입력하세요"></textarea>
+                <div className="flex justify-end">
+                  <button type="submit" className="px-4 py-2 text-sm bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">
+                    전송하기
+                  </button>
+                </div>
+              </QnAsForm>
             </div>
-          )}
+          </div>
           {/* <div id="proposal" className="p-6">
             <div className="bg-gray-50 rounded-lg p-6">
               <h3 className="text-lg font-medium mb-4">제안서 작성</h3>
