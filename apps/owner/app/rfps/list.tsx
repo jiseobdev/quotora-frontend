@@ -1,34 +1,11 @@
-import { data, Link, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData, useNavigate } from "react-router";
+import { data, Link, useFetcher, useLoaderData, useNavigate } from "react-router";
 import type { Route } from "./+types/list";
-import { fetchRfps } from "~/lib/fetch";
+import { fetchColleagues, fetchRfps } from "~/lib/fetch";
 import { getAccessToken } from "~/auth.server";
 import { STATUS_TO_CLASSNAME, STATUS_TO_LABEL } from "./constants";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import InviteModal from "./components/invite-modal";
-
-async function fetchColleagues(token?: string) {
-  const response = await fetch(new URL(`/api/v1/users/colleagues`, process.env.BACKEND_API_URL), {
-
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
-
-  if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
-  }
-
-  const result: User[] = await response.json();
-
-  return result;
-}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const token = await getAccessToken(request);

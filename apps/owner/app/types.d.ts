@@ -1,6 +1,7 @@
 interface User {
   id: number;
   name: string;
+  position: string;
   profileImage: string;
   email: string;
   createdAt: string;
