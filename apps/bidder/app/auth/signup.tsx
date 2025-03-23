@@ -26,13 +26,19 @@ export async function action({ request }: Route.ActionArgs) {
   });
 
   if (!response.ok) {
-    const result: { errors: { field: string; value: string; reason: string }[] } = await response.json();
+    const result: { code: string, errors: { field: string; value: string; reason: string }[] } = await response.json();
     const errors = result.errors.map(error => ({
       [error.field]: error.reason,
     }));
 
     if (result.errors.length > 0) {
       return data({ errors });
+    }
+
+    if (result.code === 'err_account_not_activated') {
+      return data({ errors: { companyEmail: '이메일 인증이 필요합니다.' } });
+    } else if (result.code === 'err_account_already_sign_up') {
+      return data({ errors: { companyEmail: '이미 등록된 이메일입니다.' } });
     }
 
     throw new UNSAFE_ErrorResponseImpl(
