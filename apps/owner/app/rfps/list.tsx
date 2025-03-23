@@ -27,6 +27,7 @@ export default function List() {
   const fetcher = useFetcher();
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const selectedRfp = rfps.find((rfp) => rfp.id === selectedId);
 
   const handleCheckboxChange = (id: number) => {
     setSelectedId(prevId => (prevId === id ? null : id));
@@ -54,7 +55,7 @@ export default function List() {
       <div className="flex space-x-4 mb-6">
         <button
           className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
-          disabled={selectedId === null}
+          disabled={selectedId === null || selectedRfp?.status !== 'WRITING'}
           onClick={() => navigate(`./${selectedId}/edit`)}
         >
           <i className="fa-solid fa-pen-to-square mr-2"></i>
@@ -62,7 +63,7 @@ export default function List() {
         </button>
         <button
           className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
-          disabled={selectedId === null}
+          disabled={selectedId === null || selectedRfp?.status !== 'WRITING'}
           onClick={() => {
             if (selectedId !== null) {
               finalize(selectedId)
@@ -82,7 +83,7 @@ export default function List() {
         </button>
         <button
           className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400 flex items-center"
-          disabled={selectedId === null}
+          disabled={selectedId === null || selectedRfp?.status !== 'WRITTEN'}
           onClick={() => navigate(`./${selectedId}/send`)}
         >
           <i className="fa-solid fa-paper-plane mr-2"></i>
