@@ -1,13 +1,16 @@
-import { data, Link, redirect, UNSAFE_ErrorResponseImpl, useFetcher } from "react-router";
+import { data, Link, UNSAFE_ErrorResponseImpl, useFetcher } from "react-router";
 import { z } from 'zod';
 import type { Route } from "./+types/signup";
+import clsx from "clsx";
+import { AlertDialog, AlertDialogContent } from "~/components/ui/alert-dialog";
+import { useEffect, useState } from "react";
 
 const schema = z.object({
-  fullName: z.string().nonempty(),
-  companyEmail: z.string().email(),
-  companyName: z.string().nonempty(),
-  position: z.string().nonempty(),
-  password: z.string().nonempty(),
+  fullName: z.string().nonempty("이름은 필수입니다."),
+  companyEmail: z.string().email("유효하지 않은 이메일 주소입니다."),
+  companyName: z.string().nonempty("회사명은 필수입니다."),
+  position: z.string().nonempty("직위는 필수입니다."),
+  password: z.string().nonempty("비밀번호는 필수입니다.").min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
 });
 
 export async function action({ request }: Route.ActionArgs) {
@@ -16,21 +19,30 @@ export async function action({ request }: Route.ActionArgs) {
 
   const response = await fetch(new URL('/api/v1/users/registration/orderer', process.env.BACKEND_API_URL), {
     method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
+    const result: { errors: { field: string; value: string; reason: string }[] } = await response.json();
+    const errors = result.errors.map(error => ({
+      [error.field]: error.reason,
+    }));
+
+    if (result.errors.length > 0) {
+      return data({ errors });
+    }
+
     throw new UNSAFE_ErrorResponseImpl(
       response.status,
       response.statusText,
-      body,
+      { request: body, response: result },
     );
   }
 
-  return redirect('/signin');
+  return data({ success: true });
 }
 
 export async function clientAction({ request, serverAction }: Route.ClientActionArgs) {
@@ -40,7 +52,7 @@ export async function clientAction({ request, serverAction }: Route.ClientAction
   const result = schema.safeParse(body);
 
   if (!result.success) {
-    return data({ errors: result.error });
+    return data({ errors: result.error.flatten().fieldErrors });
   }
 
   return serverAction();
@@ -48,8 +60,18 @@ export async function clientAction({ request, serverAction }: Route.ClientAction
 
 export default function Signin() {
   const fetcher = useFetcher();
-  const { Form, data = {} } = fetcher;
-  const { errors } = data;
+  const { Form, data: { data = {} } = {} } = fetcher;
+  const { success, errors } = data;
+
+  const [companyEmail, setCompanyEmail] = useState('')
+
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (success) {
+      setOpen(true);
+    }
+  }, [success]);
 
   return (
     <div id="signup-page" className="flex min-h-[100vh] bg-gray-50">
@@ -71,27 +93,64 @@ export default function Signin() {
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900">계정 생성</h2>
           </div>
-          <Form className="mt-8 space-y-6" method="post">
+          <Form className="mt-8 space-y-6" method="POST">
             <div className="space-y-4">
               <div>
                 <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">이름 *</label>
-                <input id="fullName" name="fullName" type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  required={true}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.fullName && 'border-red-500')}
+                />
+                {errors?.fullName && <p className="text-sm font-medium text-red-500 mt-1">{errors.fullName}</p>}
               </div>
               <div>
                 <label htmlFor="companyEmail" className="block text-sm font-medium text-gray-700">회사 이메일 *</label>
-                <input id="companyEmail" name="companyEmail" type="email" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <input
+                  id="companyEmail"
+                  name="companyEmail"
+                  type="email"
+                  required={true}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.companyEmail && 'border-red-500')}
+                  value={companyEmail}
+                  onChange={(e) => setCompanyEmail(e.target.value)}
+                />
+                {errors?.companyEmail && <p className="text-sm font-medium text-red-500 mt-1">{errors.companyEmail}</p>}
               </div>
               <div>
                 <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">회사명 *</label>
-                <input id="companyName" name="companyName" type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <input
+                  id="companyName"
+                  name="companyName"
+                  type="text"
+                  required={true}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.companyName && 'border-red-500')}
+                />
+                {errors?.companyName && <p className="text-sm font-medium text-red-500 mt-1">{errors.companyName}</p>}
               </div>
               <div>
                 <label htmlFor="position" className="block text-sm font-medium text-gray-700">직위 *</label>
-                <input id="position" name="position" type="text" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <input
+                  id="position"
+                  name="position"
+                  type="text"
+                  required={true}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.position && 'border-red-500')}
+                />
+                {errors?.position && <p className="text-sm font-medium text-red-500 mt-1">{errors.position}</p>}
               </div>
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호 *</label>
-                <input id="password" name="password" type="password" required={true} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required={true}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.password && 'border-red-500')}
+                />
+                {errors?.password && <p className="text-sm font-medium text-red-500 mt-1">{errors.password}</p>}
               </div>
             </div>
             <div>
@@ -109,6 +168,33 @@ export default function Signin() {
           </Form>
         </div>
       </div>
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent className="sm:max-w-md max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+          <div className="text-center">
+            <i className="text-6xl text-indigo-600 mb-6" data-fa-i2svg=""><svg className="svg-inline--fa fa-envelope" aria-hidden="true" focusable="false" data-prefix="far" data-icon="envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M64 112c-8.8 0-16 7.2-16 16v22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"></path></svg></i>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">메일함을 확인해주세요</h1>
+            <p className="text-gray-600">다음 이메일로 인증 링크를 보냈습니다</p>
+            <p className="text-indigo-600 font-medium my-2">{companyEmail}</p>
+          </div>
+          <div className="space-y-4 mt-8">
+            {/* <p className="text-sm text-gray-500 text-center">
+              이메일을 받지 못하셨나요? 스팸함을 확인하시거나
+            </p>
+            <button className="w-full py-3 px-4 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors">
+              인증 메일 재발송
+            </button> */}
+            <p className="text-sm text-gray-500 text-center">
+              이메일을 받지 못하셨나요? 스팸함을 확인해 주세요.
+            </p>
+            <div className="text-center">
+              <Link to="/signin" className="text-sm text-gray-500 hover:text-indigo-600">
+                <i className="mr-2" data-fa-i2svg=""><svg className="svg-inline--fa fa-arrow-left" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-left" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M9.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.2 288 416 288c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0L214.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"></path></svg></i>
+                로그인으로 돌아가기
+              </Link>
+            </div>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
