@@ -122,6 +122,14 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
     }
   }, [noticesData]);
 
+  const reviewsFormRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (reviewsFormRef.current) {
+      reviewsFormRef.current.reset();
+    }
+  }, [reviewsData]);
+
   return (
     <main className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -303,7 +311,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                       <p className="text-sm text-gray-700">{review.content}</p>
                     </div>
                   ))}
-                  <ReviewsForm className="mt-4" method="POST" action="./reviews">
+                  <ReviewsForm ref={reviewsFormRef} className="mt-4" method="POST" action="./reviews">
                     <textarea name="content" className="w-full rounded-md px-4 py-2 ounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" rows={3} placeholder="의견을 입력하세요"></textarea>
                     <div className="mt-2 flex justify-end">
                       <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA]">의견 등록</button>
