@@ -15,7 +15,7 @@ export default function Team() {
   const { colleagues } = useLoaderData<typeof loader>();
 
   return (
-    <main id="main" className="pt-20 px-6">
+    <main className="pt-20 px-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="overflow-x-auto">
