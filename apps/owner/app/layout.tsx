@@ -95,10 +95,10 @@ export default function Layout() {
                 </div>
               </div>
               <div className="flex items-center space-x-6">
-                <button className="flex items-center text-[#4F46E5] hover:text-[#4F46E5]">
+                <a href="mailto:support@quotora.xyz" className="flex items-center text-[#4F46E5] hover:text-[#4F46E5]">
                   <i className="fa-solid fa-headset text-xl mr-2"></i>
                   <span>Support</span>
-                </button>
+                </a>
                 {/* <button className="flex items-center text-[#4F46E5] hover:text-[#4F46E5]">
                   <i className="fa-solid fa-message text-xl mr-2"></i>
                   <span>Message</span>
