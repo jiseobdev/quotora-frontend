@@ -66,10 +66,10 @@ export default function Layout() {
                   <i className="fa-solid fa-headset text-xl mr-2"></i>
                   <span>Support</span>
                 </button>
-                <button className="flex items-center text-[#4F46E5] hover:text-[#4F46E5]">
+                {/* <button className="flex items-center text-[#4F46E5] hover:text-[#4F46E5]">
                   <i className="fa-solid fa-message text-xl mr-2"></i>
                   <span>Message</span>
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
