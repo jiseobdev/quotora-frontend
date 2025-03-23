@@ -56,6 +56,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
+    if (error.status === 401) {
+      if (typeof window !== "undefined") {
+        window.location.href = "/signout";
+      }
+      return null;
+    }
+
     message = error.status === 404 ? "404" : "Error";
     details =
       error.status === 404
