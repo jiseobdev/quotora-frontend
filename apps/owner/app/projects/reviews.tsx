@@ -38,22 +38,42 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
   const formData = await request.formData();
   const body = Object.fromEntries(formData.entries());
 
-  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/reviews`, process.env.BACKEND_API_URL), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: JSON.stringify(body),
-  });
+  if (request.method === 'POST') {
+    const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/reviews`, process.env.BACKEND_API_URL), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: JSON.stringify(body),
+    });
 
-  if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (!response.ok) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    }
+
+    return data({ success: true });
+  } else if (request.method === 'DELETE') {
+    const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/reviews/${body.id}`, process.env.BACKEND_API_URL), {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    if (!response.ok) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    }
+
+    return data({ success: true });
   }
-
-  return data({ success: true });
 }

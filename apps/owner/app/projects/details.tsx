@@ -85,6 +85,13 @@ async function fetchReviews(id: string, token?: string) {
   return result;
 }
 
+function decodeJwtPayload(token: string): Record<string, unknown> {
+  const payloadBase64 = token.split('.')[1];
+  const payload = Buffer.from(payloadBase64, 'base64url').toString('utf-8');
+
+  return JSON.parse(payload);
+}
+
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
@@ -94,6 +101,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const reviews = await fetchReviews(id, token);
 
   return data({
+    user: { id: decodeJwtPayload(token).userId },
     rfp,
     proposals,
     notices,
@@ -103,10 +111,10 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 
 export default function Details({ params: { id } }: Route.ComponentProps) {
   const loaderData = useLoaderData<typeof loader>();
-  const { data: reviewsData, Form: ReviewsForm } = useFetcher<{ reviews: Review[] }>();
+  const { data: reviewsData, Form: ReviewsForm, submit: submitReview } = useFetcher<{ reviews: Review[] }>();
   const { data: noticesData, Form: NoticesForm } = useFetcher<{ notices: Notice[] }>();
 
-  const { rfp, proposals } = loaderData;
+  const { user, rfp, proposals } = loaderData;
   const notices = noticesData?.notices ?? loaderData.notices;
   const reviews = reviewsData?.reviews ?? loaderData.reviews;
 
@@ -303,10 +311,17 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                     <div key={review.id} className="bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-medium">{review.reviewer.name}</span>
-                        <div className="flex gap-2">
+                        {/* <div className="flex gap-2">
                           <button className="text-sm text-blue-600 hover:text-blue-800">수정</button>
-                          <button className="text-sm text-red-600 hover:text-red-800">삭제</button>
-                        </div>
+                          {user.id === review.reviewer.id && (
+                            <button
+                              className="text-sm text-red-600 hover:text-red-800"
+                              onClick={() => submitReview({ id: review.id }, { action: './reviews', method: 'DELETE' })}
+                            >
+                              삭제
+                            </button>
+                          )}
+                        </div> */}
                       </div>
                       <p className="text-sm text-gray-700">{review.content}</p>
                     </div>

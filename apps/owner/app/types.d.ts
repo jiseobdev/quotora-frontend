@@ -52,7 +52,7 @@ interface Notice {
 interface Review {
   id: number;
   content: string;
-  reviewer: { name: string };
+  reviewer: { id: number; name: string };
   createdAt: string;
 }
 
