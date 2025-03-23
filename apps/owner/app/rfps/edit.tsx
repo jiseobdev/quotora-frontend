@@ -27,17 +27,20 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 
   const body = {
     ...restBody,
+    expectedSchedule: new Date(restBody.expectedSchedule.toString()).toISOString(),
+    submissionDeadline: new Date(restBody.submissionDeadline.toString()).toISOString(),
+    selectionNotificationDate: new Date(restBody.selectionNotificationDate.toString()).toISOString(),
     selectionCriteria,
     rawfirms: rawfirms.toString().split(',').map((firm) => firm.trim()),
   };
 
   const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}`, process.env.BACKEND_API_URL), {
     method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-      body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {
