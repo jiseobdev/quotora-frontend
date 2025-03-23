@@ -80,7 +80,7 @@ export default function Rfp() {
                 <p className="text-sm text-gray-600">{rfp.overview}</p>
               </div>
               <div className="border-b border-gray-200 pb-4">
-                <h4 className="font-medium text-gray-700 mb-2">원하는 법률자문의 내용</h4>
+                <h4 className="font-medium text-gray-700 mb-2">원하는 자문의 내용</h4>
                 <ul className="text-sm text-gray-600 list-disc pl-4 space-y-1">
                   {rfp.desiredLegalAdvice.split('\n').map((legalAdvice, index) => (
                     <li key={index}>{legalAdvice}</li>

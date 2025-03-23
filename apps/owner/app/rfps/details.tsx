@@ -57,7 +57,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             <p className="text-gray-600">{rfp.overview}</p>
           </div>
           <div>
-            <h3 className="font-medium text-gray-900 mb-2">원하는 법률자문의 내용</h3>
+            <h3 className="font-medium text-gray-900 mb-2">원하는 자문의 내용</h3>
             <p className="text-gray-600">{rfp.desiredLegalAdvice}</p>
           </div>
           <div>

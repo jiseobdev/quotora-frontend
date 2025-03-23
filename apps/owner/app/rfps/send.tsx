@@ -116,7 +116,7 @@ export default function Send({ params: { id } }: Route.ComponentProps) {
                 <p>{rfp.overview}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-600">원하는 법률자문의 내용</p>
+                <p className="text-sm font-medium text-gray-600">원하는 자문의 내용</p>
                 <p>{rfp.desiredLegalAdvice}</p>
               </div>
               <div>

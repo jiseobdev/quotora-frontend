@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { useState } from "react";
 import { Form } from "react-router";
 
@@ -50,7 +51,7 @@ export default function RfpForm({ rfp }: Props) {
             <textarea id="overview" name="overview" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5] h-32" placeholder="소송, M&amp;A, IPO, 금융, 규제당국 대응, 사내 이슈 점검 등 진행하시려는 프로젝트 개요를 써주세요" defaultValue={rfp?.overview}></textarea>
           </div>
           <div>
-            <label htmlFor="desiredLegalAdvice" className="block text-sm font-medium text-gray-700 mb-2">원하는 법률자문의 내용</label>
+            <label htmlFor="desiredLegalAdvice" className="block text-sm font-medium text-gray-700 mb-2">원하는 자문의 내용</label>
             <textarea id="desiredLegalAdvice" name="desiredLegalAdvice" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5] h-32" placeholder="원하는 결과가 있다면 구체적으로 기재해주세요" defaultValue={rfp?.desiredLegalAdvice}></textarea>
           </div>
           <div>
@@ -60,17 +61,17 @@ export default function RfpForm({ rfp }: Props) {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label htmlFor="expectedSchedule" className="block text-sm font-medium text-gray-700 mb-2">예상 일정</label>
-              <input id="expectedSchedule" name="expectedSchedule" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.expectedSchedule} />
+              <input id="expectedSchedule" name="expectedSchedule" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.expectedSchedule ? format(new Date(rfp?.expectedSchedule), 'yyyy-MM-dd') : undefined} />
             </div>
             <div>
               <label htmlFor="submissionDeadline" className="block text-sm font-medium text-gray-700 mb-2">RFP 제출 마감일</label>
-              <input id="submissionDeadline" name="submissionDeadline" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.submissionDeadline} />
+              <input id="submissionDeadline" name="submissionDeadline" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.submissionDeadline ? format(new Date(rfp?.submissionDeadline), 'yyyy-MM-dd') : undefined} />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label htmlFor="selectionNotificationDate" className="block text-sm font-medium text-gray-700 mb-2">자문사 선정 통보 예정일</label>
-              <input id="selectionNotificationDate" name="selectionNotificationDate" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.selectionNotificationDate} />
+              <input id="selectionNotificationDate" name="selectionNotificationDate" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.selectionNotificationDate ? format(new Date(rfp?.selectionNotificationDate), 'yyyy-MM-dd') : undefined} />
             </div>
             <div>
               <label htmlFor="isOralPresentation" className="block text-sm font-medium text-gray-700 mb-2">구두 프리젠테이션 여부</label>
