@@ -4,6 +4,7 @@ import { getAccessToken } from "~/auth.server";
 import { fetchRfp } from "~/lib/fetch";
 import { data, Form, redirect, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import { format } from "date-fns";
+import { nl2br } from "~/lib/string";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -113,15 +114,15 @@ export default function Send({ params: { id } }: Route.ComponentProps) {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">프로젝트 개요</p>
-                <p>{rfp.overview}</p>
+                <p>{nl2br(rfp.overview)}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">원하는 자문의 내용</p>
-                <p>{rfp.desiredLegalAdvice}</p>
+                <p>{nl2br(rfp.desiredLegalAdvice)}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">특별 요구사항</p>
-                <p>{rfp.specialRequirements}</p>
+                <p>{nl2br(rfp.specialRequirements)}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>

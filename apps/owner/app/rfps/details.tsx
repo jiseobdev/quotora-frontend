@@ -4,6 +4,7 @@ import { getAccessToken } from "~/auth.server";
 import { format } from "date-fns";
 import { fetchComments, fetchRfp } from "~/lib/fetch";
 import { useEffect } from "react";
+import { nl2br } from "~/lib/string";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -54,15 +55,15 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
           </div>
           <div>
             <h3 className="font-medium text-gray-900 mb-2">프로젝트 개요</h3>
-            <p className="text-gray-600">{rfp.overview}</p>
+            <p className="text-gray-600">{nl2br(rfp.overview)}</p>
           </div>
           <div>
             <h3 className="font-medium text-gray-900 mb-2">원하는 자문의 내용</h3>
-            <p className="text-gray-600">{rfp.desiredLegalAdvice}</p>
+            <p className="text-gray-600">{nl2br(rfp.desiredLegalAdvice)}</p>
           </div>
           <div>
             <h3 className="font-medium text-gray-900 mb-2">특별 요구사항</h3>
-            <p className="text-gray-600">{rfp.specialRequirements}</p>
+            <p className="text-gray-600">{nl2br(rfp.specialRequirements)}</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

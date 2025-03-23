@@ -5,6 +5,7 @@ import { data, Form, replace, UNSAFE_ErrorResponseImpl, useLoaderData } from "re
 import { differenceInCalendarDays } from "date-fns";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from "~/components/ui/alert-dialog";
 import { getDDay } from "~/lib/date";
+import { nl2br } from "~/lib/string";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -77,7 +78,7 @@ export default function Rfp() {
               </div>
               <div className="border-b border-gray-200 pb-4">
                 <h4 className="font-medium text-gray-700 mb-2">프로젝트 개요</h4>
-                <p className="text-sm text-gray-600">{rfp.overview}</p>
+                <p className="text-sm text-gray-600">{nl2br(rfp.overview)}</p>
               </div>
               <div className="border-b border-gray-200 pb-4">
                 <h4 className="font-medium text-gray-700 mb-2">원하는 자문의 내용</h4>
