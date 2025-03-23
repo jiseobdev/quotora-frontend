@@ -35,10 +35,12 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
           <h1 className="text-xl font-semibold text-gray-900">RFP 검토</h1>
           <p className="text-sm text-gray-500">최종 수정: {format(new Date(rfp.updatedAt), 'yyyy.MM.dd HH:mm:ss')}</p>
         </div>
-        {rfp.status === 'WRITING' && <Link to="./edit" className="text-indigo-600 hover:text-indigo-700">
-          <i className="fa-regular fa-pen-to-square mr-1"></i>
-          수정
-        </Link>}
+        {rfp.status === 'WRITING' && (
+          <Link to="./edit" className="text-indigo-600 hover:text-indigo-700">
+            <i className="fa-solid fa-pen-to-square mr-1"></i>
+            수정
+          </Link>
+        )}
       </div>
       <div id="rfp-details" className="bg-white rounded-lg shadow p-6">
         <h2 className="text-lg font-semibold mb-4">RFP 조항</h2>
