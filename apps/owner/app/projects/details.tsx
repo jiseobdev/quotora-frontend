@@ -2,7 +2,7 @@ import { data, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { differenceInCalendarDays } from "date-fns";
-import { fetchRfp } from "~/lib/fetch";
+import { fetchQnas, fetchRfp } from "~/lib/fetch";
 import { useEffect, useRef } from "react";
 
 function getDDay(targetDate: Date): string {
@@ -99,6 +99,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const proposals = await fetchProposals(id, token);
   const notices = await fetchNotices(id, token);
   const reviews = await fetchReviews(id, token);
+  const qnas = await fetchQnas(id, token);
 
   return data({
     user: { id: decodeJwtPayload(token).userId },
@@ -106,6 +107,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
     proposals,
     notices,
     reviews,
+    qnas,
   });
 }
 
@@ -113,10 +115,12 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
   const loaderData = useLoaderData<typeof loader>();
   const { data: reviewsData, Form: ReviewsForm, submit: submitReview } = useFetcher<{ reviews: Review[] }>();
   const { data: noticesData, Form: NoticesForm } = useFetcher<{ notices: Notice[] }>();
+  const { data: qnasData, Form: QnAsForm } = useFetcher<{ qnas: QnA[] }>();
 
   const { user, rfp, proposals } = loaderData;
   const notices = noticesData?.notices ?? loaderData.notices;
   const reviews = reviewsData?.reviews ?? loaderData.reviews;
+  const qnas = qnasData?.qnas ?? loaderData.qnas;
 
   const proposalsByRawfirms = Object.fromEntries(
     rfp.rawfirms.map((firmName) => ([firmName, proposals.find((proposal) => proposal.lawfirmName === firmName)]))

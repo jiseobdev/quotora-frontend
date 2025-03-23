@@ -69,3 +69,18 @@ interface Comment {
     createdAt: string;
   }[];
 }
+
+interface QnA {
+  question: {
+    id: number;
+    content: string;
+    user: User;
+    createdAt: string;
+  };
+  answer: {
+    id: number;
+    content: string;
+    user: User;
+    createdAt: string;
+  };
+}
