@@ -1,18 +1,18 @@
 import { getAccessToken } from "~/auth.server";
 import type { Route } from "./+types/team";
 import { data, useLoaderData } from "react-router";
-import { fetchColleagues } from "~/lib/fetch";
+import { fetchTeam } from "~/lib/fetch";
 
-export async function loader({ request, params: { id } }: Route.LoaderArgs) {
+export async function loader({ request }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
-  const colleagues = await fetchColleagues(token);
+  const team = await fetchTeam(token);
 
-  return data({ colleagues });
+  return data({ team });
 }
 
 export default function Team() {
-  const { colleagues } = useLoaderData<typeof loader>();
+  const { team } = useLoaderData<typeof loader>();
 
   return (
     <main className="pt-20 px-6 min-h-[calc(100vh-var(--spacing)*16)]">
@@ -29,11 +29,11 @@ export default function Team() {
                 </tr>
               </thead>
               <tbody>
-                {colleagues.map((colleague) => (
-                  <tr key={colleague.id} className="border-b border-gray-100">
-                    <td className="py-3 px-4">{colleague.name}</td>
-                    <td className="py-3 px-4">{colleague.position}</td>
-                    <td className="py-3 px-4">{colleague.email}</td>
+                {team.map((user) => (
+                  <tr key={user.id} className="border-b border-gray-100">
+                    <td className="py-3 px-4">{user.name}</td>
+                    <td className="py-3 px-4">{user.position}</td>
+                    <td className="py-3 px-4">{user.email}</td>
                   </tr>
                 ))}
                 {/* <tr className="border-b border-gray-100">
