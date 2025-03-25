@@ -21,7 +21,7 @@ export default function Layout() {
     <div className="flex h-full bg-gray-50">
       <div id="sidebar" className="hidden md:flex md:w-64 md:flex-col fixed h-full">
         <div className="flex flex-col flex-grow bg-white pt-5 border-r border-gray-200">
-          <NavLink to="/" className="flex items-center flex-shrink-0 px-4">
+          <NavLink to="/projects" className="flex items-center flex-shrink-0 px-4">
             <span className="text-[#4F46E5] text-2xl font-bold">Quotora</span>
           </NavLink>
           <div className="mt-8 flex-grow flex flex-col">
