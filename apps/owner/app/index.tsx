@@ -1,8 +1,4 @@
-import { NavLink, redirect } from "react-router";
-
-// export async function loader() {
-//   return redirect('/projects');
-// }
+import { Link, NavLink } from "react-router";
 
 export default function Index() {
   return (
@@ -31,7 +27,7 @@ export default function Index() {
               <h1 className="text-5xl font-bold text-[#303A52] mb-6">더 빠르고 편한<br />견적 요청 및 입찰 관리 솔루션</h1>
               <p className="text-xl text-[#6C757D] mb-8">RFP 작성부터 입찰 절차까지 자동화된 프로세스로<br />더 효율적인 업무 환경을 제공합니다.</p>
               <div className="flex space-x-4">
-                <NavLink to="/signup" className="bg-[#4F46E5] text-white px-8 py-3 rounded-lg hover:bg-[#4338CA] break-keep cursor-pointer">무료로 시작하기</NavLink>
+                <Link to="/signup" className="bg-[#4F46E5] text-white px-8 py-3 rounded-lg hover:bg-[#4338CA] break-keep cursor-pointer">무료로 시작하기</Link>
                 <span className="border border-[#4F46E5] text-[#4F46E5] px-8 py-3 rounded-lg hover:bg-[#D6D2F2] break-keep cursor-pointer">서비스 알아보기</span>
               </div>
             </div>

@@ -1,6 +1,8 @@
 import { type RouteConfig, index, layout, prefix, route } from "@react-router/dev/routes";
 
 export default [
+  index('./index.tsx'),
+
   layout('./auth/layout.tsx', [
     route('signin', './auth/signin.tsx'),
     route('signout', './auth/signout.tsx'),
@@ -8,8 +10,6 @@ export default [
   ]),
 
   layout('./layout.tsx', [
-    index('./index.tsx'),
-
     ...prefix('projects', [
       index('./projects/list.tsx'),
       route(':id', './projects/details.tsx'),
