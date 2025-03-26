@@ -1,15 +1,13 @@
 import { Outlet, redirect } from "react-router";
 import type { Route } from "./+types/layout";
-import { accessTokenCookie } from "~/auth.server";
+import { getAccessToken } from "~/auth.server";
 import { fetchCurrentUser } from "~/lib/fetch";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const cookieHeader = request.headers.get('Cookie');
-  const accessToken = await accessTokenCookie.parse(cookieHeader);
+  const token = await getAccessToken(request);
+  const user = await fetchCurrentUser(token);
 
-  const user = await fetchCurrentUser(accessToken);
-
-  if (accessToken && user) {
+  if (token && user) {
     return redirect('/projects');
   }
 }
