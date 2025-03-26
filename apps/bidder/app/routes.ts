@@ -7,6 +7,7 @@ export default [
     route('signin', './auth/signin.tsx'),
     route('signout', './auth/signout.tsx'),
     route('signup', './auth/signup.tsx'),
+    route('email-verification', './auth/email-verification.tsx'),
   ]),
 
   layout('./layout.tsx', [
