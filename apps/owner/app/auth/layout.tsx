@@ -7,7 +7,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const cookieHeader = request.headers.get('Cookie');
   const accessToken = await accessTokenCookie.parse(cookieHeader);
 
-  const user = await fetchCurrentUser();
+  const user = await fetchCurrentUser(accessToken);
 
   if (accessToken && user) {
     return redirect('/projects');
