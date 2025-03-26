@@ -3,7 +3,7 @@ import type { Route } from "./+types/email-verification";
 
 export async function action({ params: { code } }: Route.ActionArgs) {
   const response = await fetch(new URL(`/api/v1/users/verify/${code}`, process.env.BACKEND_API_URL), {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
