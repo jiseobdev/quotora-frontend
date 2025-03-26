@@ -6,8 +6,9 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 const sentryConfig: SentryReactRouterBuildOptions = {
   org: "drinq",
-  project: "quotora-frontend",
+  project: "quotora-frontend_owner",
   authToken: process.env.SENTRY_AUTH_TOKEN,
+  telemetry: false,
 };
 
 export default defineConfig(config => ({

@@ -72,7 +72,7 @@ export default function handleRequest(
 }
 
 Sentry.init({
-  dsn: "https://35722bd5cea6eb23e88b028a55cd2644@o4509042618990592.ingest.us.sentry.io/4509042635964417",
+  dsn: "https://81161742e96f919101fb14b5ac5d9ed9@o4509042618990592.ingest.us.sentry.io/4509042783420416",
   tracesSampleRate: 1.0,
 });
 
