@@ -3,11 +3,13 @@ import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { fetchNotices, fetchProposal, fetchQnas, fetchRfp } from "~/lib/fetch";
 import { getDDay } from "~/lib/date";
-import { format, intlFormatDistance } from "date-fns";
+import { format } from "date-fns";
 import clsx from "clsx";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "~/components/ui/dialog";
 import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "~/components/ui/file-upload";
 import { useEffect, useRef, useState } from "react";
+import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
+import { MAX_FILES } from "./constants";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -52,17 +54,14 @@ async function uploadFile(id: string | number, file: File, token?: string) {
 export async function action({ request, params: { id } }: Route.ActionArgs) {
   const token = await getAccessToken(request);
 
-  const formData = await request.formData();
-  const files = formData.getAll('file').filter((file) => file instanceof File);
-
-  for (const file of files) {
-    await uploadFile(id, file, token);
-  }
+  await parseFormData(request, async (fileUpload: FileUpload) => {
+    if (fileUpload.fieldName === "file") {
+      await uploadFile(id, fileUpload, token);
+    }
+  });
 
   return data({ success: true })
 }
-
-const MAX_FILES = 5;
 
 export default function Details() {
   const { proposal, rfp, notices, qnas } = useLoaderData<typeof loader>();
@@ -280,7 +279,7 @@ export default function Details() {
                   제안서 등 파일 업로드하기
                 </DialogTrigger>
                 <DialogContent className="bg-white rounded-lg min-w-[500px] max-w-fit p-6">
-                  <Form method="POST">
+                  <Form method="POST" encType="multipart/form-data">
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="text-lg font-medium text-gray-900">파일 첨부</h3>
                       <DialogClose className="text-gray-400 hover:text-gray-500">
