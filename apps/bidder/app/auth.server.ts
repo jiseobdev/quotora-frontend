@@ -28,6 +28,7 @@ authenticator.use(
 export const accessTokenCookie = createCookie('access_token', {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
+  domain: process.env.NODE_ENV === 'production' ? 'quotora.xyz' : undefined,
   sameSite: 'strict',
   path: '/',
   maxAge: 60 * 60,
