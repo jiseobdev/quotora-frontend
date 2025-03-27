@@ -10,7 +10,7 @@ export default function Index() {
               <NavLink to="/" className="text-2xl font-bold text-[#4F46E5] cursor-pointer">Quotora</NavLink>
               <nav className="hidden md:flex space-x-8">
                 <span className="text-[#303A52] hover:text-[#4F46E5] cursor-pointer">About</span>
-                <a href="mailto:contact@quotora.xyz" className="text-[#303A52] hover:text-[#4F46E5] cursor-pointer">Contact</a>
+                <a href="mailto:support@quotora.xyz" className="text-[#303A52] hover:text-[#4F46E5] cursor-pointer">Contact</a>
               </nav>
             </div>
             <div className="flex items-center space-x-4">
@@ -125,7 +125,7 @@ export default function Index() {
               <h4 className="font-bold mb-4">Quick Links</h4>
               <ul className="space-y-2">
                 <li><span className="text-[#D6D2F2] hover:text-white cursor-pointer">About</span></li>
-                <li><a href="mailto:contact@quotora.xyz" className="text-[#D6D2F2] hover:text-white cursor-pointer">Contact</a></li>
+                <li><a href="mailto:support@quotora.xyz" className="text-[#D6D2F2] hover:text-white cursor-pointer">Contact</a></li>
               </ul>
             </div>
             {/* <div>
