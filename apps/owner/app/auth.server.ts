@@ -1,4 +1,4 @@
-import { createCookie } from 'react-router';
+import { createCookie, UNSAFE_ErrorResponseImpl } from 'react-router';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
@@ -19,8 +19,16 @@ authenticator.use(
         password,
       }),
     });
-    const data: { token: string } = await response.json();
 
+    if (!response.ok) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        await response.json(),
+      );
+    }
+
+    const data: { token: string } = await response.json();
     return data.token as string;
   }),
 );

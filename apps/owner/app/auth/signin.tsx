@@ -1,26 +1,45 @@
-import { data, Form, Link, redirect } from 'react-router';
+import { data, Form, isRouteErrorResponse, Link, redirect, UNSAFE_ErrorResponseImpl, useActionData } from 'react-router';
 import type { Route } from './+types/signin';
 import { accessTokenCookie, authenticator } from '~/auth.server';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from '~/components/ui/alert-dialog';
 
 export async function action({ request }: Route.ActionArgs) {
-  const accessToken = await authenticator.authenticate('form', request);
+  try {
+    const accessToken = await authenticator.authenticate('form', request);
 
-  if (!accessToken) {
-    return data({ error: 'Unauthorized' }, { status: 401 });
+    if (!accessToken) {
+      throw new UNSAFE_ErrorResponseImpl(401, 'Unauthorized', null);
+    }
+
+    const url = new URL(request.url);
+    const redirectTo = url.searchParams.get("redirectTo") || "/projects";
+
+    return redirect(redirectTo, {
+      headers: {
+        'Set-Cookie': await accessTokenCookie.serialize(accessToken),
+      },
+    });
+  } catch (error: unknown) {
+    if (isRouteErrorResponse(error) && error.status === 400) {
+      const errorData: { code: string, message: string, errors: [] | null } = error.data;
+
+      let message = '';
+      if (errorData.code === 'err_account_login_failed') {
+        message = '이메일 또는 비밀번호를 다시 확인해 주세요.';
+      } else if (errorData.code === 'err_account_not_activated') {
+        message = '이메일 인증이 필요합니다. 메일함을 확인해 주세요.';
+      }
+
+      return data({ ...errorData, message: message || errorData.message });
+    }
+
+    throw error;
   }
-
-  const url = new URL(request.url);
-  const redirectTo = url.searchParams.get("redirectTo") || "/projects";
-
-  return redirect(redirectTo, {
-    headers: {
-      'Set-Cookie': await accessTokenCookie.serialize(accessToken),
-    },
-  });
 }
 
 export default function Signin() {
+  const actionData = useActionData<typeof action>();
+
   return (
     <div id="auth-container" className="flex min-h-[100vh]">
       <div className="hidden lg:flex lg:w-1/2 bg-[#4F46E5] relative items-center justify-center">
@@ -46,6 +65,13 @@ export default function Signin() {
                 </div>
               </div>
             </div>
+            {actionData?.message && (
+              <div className="space-y-1">
+                <div className="text-sm font-medium text-red-500">
+                  {actionData?.message}
+                </div>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <input type="checkbox" className="h-4 w-4 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]" />
