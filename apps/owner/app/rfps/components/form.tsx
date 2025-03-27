@@ -43,7 +43,7 @@ export default function RfpForm({ rfp }: Props) {
             </div>
             <div>
               <label htmlFor="estimatedCost" className="block text-sm font-medium text-gray-700 mb-2">비용 예상액</label>
-              <input id="estimatedCost" name="estimatedCost" type="text" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" placeholder="₩" defaultValue={rfp?.estimatedCost} />
+              <input id="estimatedCost" name="estimatedCost" type="number" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" placeholder="₩" defaultValue={rfp?.estimatedCost} />
             </div>
           </div>
           <div>
