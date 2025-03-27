@@ -65,7 +65,7 @@ export default function Signin() {
   const resendVerificationFetcher = useFetcher<{ success: boolean }>();
   const handleSubmitResendVerification = async (e: React.FormEvent) => {
     await resendVerificationFetcher.submit(
-      { token: actionData?.token ?? null, email: companyEmail },
+      { token: actionData?.token ?? null },
       { action: '/resend-verification-email', method: 'POST' }
     );
     setResendModalOpened(false);
