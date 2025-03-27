@@ -54,6 +54,7 @@ export default function Team() {
     e.preventDefault();
 
     await submit({ memberIds }, { method: "POST" });
+    setMemberIds([]);
     setOpen(false);
   };
 
