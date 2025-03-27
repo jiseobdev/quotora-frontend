@@ -1,8 +1,8 @@
-import { data, Form, isRouteErrorResponse, Link, redirect, UNSAFE_ErrorResponseImpl, useActionData } from 'react-router';
+import { data, Form, isRouteErrorResponse, Link, redirect, UNSAFE_ErrorResponseImpl, useActionData, useFetcher } from 'react-router';
 import type { Route } from './+types/signin';
 import { accessTokenCookie, authenticator } from '~/auth.server';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from '~/components/ui/alert-dialog';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export async function action({ request }: Route.ActionArgs) {
   try {
@@ -44,6 +44,24 @@ export default function Signin() {
   const [open, setOpen] = useState(false);
   const openModal = () => setOpen(true);
 
+  const resetPasswordFetcher = useFetcher<{ success: boolean }>();
+  const resetPasswordFormRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmitResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await resetPasswordFetcher.submit(resetPasswordFormRef.current, { method: 'POST', action: '/request-reset-password' });
+    return false;
+  };
+
+  useEffect(() => {
+    if (resetPasswordFetcher.data?.success) {
+      setOpen(false);
+      resetPasswordFormRef.current?.reset();
+
+      alert('비밀번호 재설정 안내를 이메일로 전송했습니다.');
+    }
+  }, [resetPasswordFetcher]);
+
   return (
     <div id="auth-container" className="flex min-h-[100vh]">
       <div className="hidden lg:flex lg:w-1/2 bg-[#4F46E5] relative items-center justify-center">
@@ -81,7 +99,7 @@ export default function Signin() {
                 <input type="checkbox" className="h-4 w-4 text-[#4F46E5] border-gray-300 rounded focus:ring-[#4F46E5]" />
                 <label className="ml-2 block text-sm text-gray-700">로그인 상태 유지</label>
               </div>
-              <button className="text-sm font-medium text-[#4F46E5] hover:text-[#4F46E5]/80 cursor-pointer" onClick={openModal}>비밀번호 찾기</button>
+              <button type="button" className="text-sm font-medium text-[#4F46E5] hover:text-[#4F46E5]/80 cursor-pointer" onClick={openModal}>비밀번호 찾기</button>
             </div>
             <button type="submit" className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#4F46E5] hover:bg-[#4F46E5]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5]">
               로그인
@@ -97,13 +115,13 @@ export default function Signin() {
       </div>
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent>
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <resetPasswordFetcher.Form action="/request-reset-password" method="POST" onSubmit={handleSubmitResetPassword} ref={resetPasswordFormRef} className="bg-white rounded-2xl shadow-xl p-8">
             <div className="text-center mb-8">
               <h2 className="text-[#4F46E5] text-3xl font-semibold mb-4">Quotora</h2>
               <h1 className="text-2xl font-extrabold text-gray-900 mb-2">비밀번호를 잊으셨나요?</h1>
               <p className="text-gray-600">회사 이메일 주소를 입력하시면<br />비밀번호 재설정 코드를 보내드립니다.</p>
             </div>
-            <form className="space-y-6">
+            <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
                   회사 이메일
@@ -116,14 +134,14 @@ export default function Signin() {
               <button type="submit" className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-colors">
                 재설정 코드 받기
               </button>
-            </form>
+            </div>
             <div className="mt-6 flex justify-center">
               <AlertDialogCancel className="border-0 text-sm text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-2">
                 <i className="fa-solid fa-arrow-left h-(--text-xs)"></i>
                 로그인으로 돌아가기
               </AlertDialogCancel>
             </div>
-          </div>
+          </resetPasswordFetcher.Form>
         </AlertDialogContent>
       </AlertDialog>
     </div>
