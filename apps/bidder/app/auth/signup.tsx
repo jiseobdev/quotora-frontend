@@ -27,11 +27,12 @@ export async function action({ request }: Route.ActionArgs) {
 
   if (!response.ok) {
     const result: { code: string, errors: { field: string; value: string; reason: string }[] } = await response.json();
-    const errors = result.errors.map(error => ({
-      [error.field]: error.reason,
-    }));
 
-    if (result.errors.length > 0) {
+    if (result.errors && result.errors.length > 0) {
+      const errors = result.errors?.map(error => ({
+        [error.field]: error.reason,
+      }));
+
       return data({ errors });
     }
 
