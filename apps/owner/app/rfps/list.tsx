@@ -119,7 +119,7 @@ export default function List() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  {new Intl.NumberFormat(navigator.language, { style: "currency", currency: "KRW" }).format(rfp.estimatedCost)}
+                  {new Intl.NumberFormat(navigator?.language || 'ko-KR', { style: "currency", currency: "KRW" }).format(rfp.estimatedCost)}
                 </td>
                 <td className="px-6 py-4">{rfp.rawfirms.join(', ')}</td>
                 <td className="px-6 py-4">
