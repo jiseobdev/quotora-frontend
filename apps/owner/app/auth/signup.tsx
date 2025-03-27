@@ -1,4 +1,4 @@
-import { data, Link, UNSAFE_ErrorResponseImpl, useFetcher } from "react-router";
+import { data, Form, Link, UNSAFE_ErrorResponseImpl, useActionData, useFetcher } from "react-router";
 import { z } from 'zod';
 import type { Route } from "./+types/signup";
 import clsx from "clsx";
@@ -33,13 +33,13 @@ export async function action({ request }: Route.ActionArgs) {
         [error.field]: error.reason,
       }));
 
-      return data({ errors });
+      return data({ success: false, errors: Object.fromEntries(errors.map((value) => [value.field, value.reason])) });
     }
 
     if (result.code === 'err_account_not_activated') {
-      return data({ errors: { companyEmail: '이메일 인증이 필요합니다.' } });
+      return data({ success: false, errors: { companyEmail: '이메일 인증이 필요합니다.' } as { [k: string]: string; } });
     } else if (result.code === 'err_account_already_sign_up') {
-      return data({ errors: { companyEmail: '이미 등록된 이메일입니다.' } });
+      return data({ success: false, errors: { companyEmail: '이미 등록된 이메일입니다.' } as { [k: string]: string; } });
     }
 
     throw new UNSAFE_ErrorResponseImpl(
@@ -49,7 +49,7 @@ export async function action({ request }: Route.ActionArgs) {
     );
   }
 
-  return data({ success: true });
+  return data({ success: true, errors: undefined });
 }
 
 export async function clientAction({ request, serverAction }: Route.ClientActionArgs) {
@@ -59,26 +59,24 @@ export async function clientAction({ request, serverAction }: Route.ClientAction
   const result = schema.safeParse(body);
 
   if (!result.success) {
-    return data({ errors: result.error.flatten().fieldErrors });
+    return data({ success: false, errors: result.error.flatten().fieldErrors });
   }
 
   return serverAction();
 }
 
 export default function Signin() {
-  const fetcher = useFetcher();
-  const { Form, data: { data = {} } = {} } = fetcher;
-  const { success, errors } = data;
+  const actionData = useActionData<typeof action>();
 
   const [companyEmail, setCompanyEmail] = useState('')
 
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (success) {
+    if (actionData?.success) {
       setOpen(true);
     }
-  }, [success]);
+  }, [actionData]);
 
   return (
     <div id="signup-page" className="flex min-h-[100vh] bg-gray-50">
@@ -109,9 +107,9 @@ export default function Signin() {
                   name="fullName"
                   type="text"
                   required={true}
-                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.fullName && 'border-red-500')}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', actionData?.errors?.fullName && 'border-red-500')}
                 />
-                {errors?.fullName && <p className="text-sm font-medium text-red-500 mt-1">{errors.fullName}</p>}
+                {actionData?.errors?.fullName && <p className="text-sm font-medium text-red-500 mt-1">{actionData.errors.fullName}</p>}
               </div>
               <div>
                 <label htmlFor="companyEmail" className="block text-sm font-medium text-gray-700">회사 이메일 *</label>
@@ -120,11 +118,11 @@ export default function Signin() {
                   name="companyEmail"
                   type="email"
                   required={true}
-                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.companyEmail && 'border-red-500')}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', actionData?.errors?.companyEmail && 'border-red-500')}
                   value={companyEmail}
                   onChange={(e) => setCompanyEmail(e.target.value)}
                 />
-                {errors?.companyEmail && <p className="text-sm font-medium text-red-500 mt-1">{errors.companyEmail}</p>}
+                {actionData?.errors?.companyEmail && <p className="text-sm font-medium text-red-500 mt-1">{actionData.errors.companyEmail}</p>}
               </div>
               <div>
                 <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">회사명 *</label>
@@ -133,9 +131,9 @@ export default function Signin() {
                   name="companyName"
                   type="text"
                   required={true}
-                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.companyName && 'border-red-500')}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', actionData?.errors?.companyName && 'border-red-500')}
                 />
-                {errors?.companyName && <p className="text-sm font-medium text-red-500 mt-1">{errors.companyName}</p>}
+                {actionData?.errors?.companyName && <p className="text-sm font-medium text-red-500 mt-1">{actionData.errors.companyName}</p>}
               </div>
               <div>
                 <label htmlFor="position" className="block text-sm font-medium text-gray-700">직위 *</label>
@@ -144,9 +142,9 @@ export default function Signin() {
                   name="position"
                   type="text"
                   required={true}
-                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.position && 'border-red-500')}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', actionData?.errors?.position && 'border-red-500')}
                 />
-                {errors?.position && <p className="text-sm font-medium text-red-500 mt-1">{errors.position}</p>}
+                {actionData?.errors?.position && <p className="text-sm font-medium text-red-500 mt-1">{actionData.errors.position}</p>}
               </div>
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">비밀번호 *</label>
@@ -155,9 +153,9 @@ export default function Signin() {
                   name="password"
                   type="password"
                   required={true}
-                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', errors?.password && 'border-red-500')}
+                  className={clsx('mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500', actionData?.errors?.password && 'border-red-500')}
                 />
-                {errors?.password && <p className="text-sm font-medium text-red-500 mt-1">{errors.password}</p>}
+                {actionData?.errors?.password && <p className="text-sm font-medium text-red-500 mt-1">{actionData.errors.password}</p>}
               </div>
             </div>
             <div>
