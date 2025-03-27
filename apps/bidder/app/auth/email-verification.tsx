@@ -13,9 +13,13 @@ export async function loader({ params: { code } }: Route.ActionArgs) {
     throw new UNSAFE_ErrorResponseImpl(
       response.status,
       response.statusText,
-      { request: { code }, response: await response.json() },
+      { request: { code } },
     );
   }
 
   return replace('/signin');
+}
+
+export default function EmailVerification() {
+  return null;
 }
