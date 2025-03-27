@@ -10,7 +10,10 @@ export async function action({ request }: Route.ActionArgs) {
     return data({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  return redirect('/projects', {
+  const url = new URL(request.url);
+  const redirectTo = url.searchParams.get("redirectTo") || "/projects";
+
+  return redirect(redirectTo, {
     headers: {
       'Set-Cookie': await accessTokenCookie.serialize(accessToken),
     },

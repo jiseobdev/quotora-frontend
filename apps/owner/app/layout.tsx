@@ -8,7 +8,11 @@ export async function loader({ request }: Route.LoaderArgs) {
   const accessToken = await accessTokenCookie.parse(cookieHeader);
 
   if (!accessToken) {
-    return redirect('/signin');
+    const url = new URL(request.url);
+    const redirectTo = url.pathname + url.search;
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+
+    return redirect(`/signin?${searchParams}`);
   }
 }
 
