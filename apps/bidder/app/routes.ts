@@ -10,6 +10,7 @@ export default [
     route('email-verification', './auth/email-verification.tsx'),
     route('reset-password', './auth/reset-password.tsx'),
     route('request-reset-password', './auth/request-reset-password.tsx'),
+    route('resend-verification-email', './auth/resend-verification-email.tsx'),
   ]),
 
   layout('./layout.tsx', [

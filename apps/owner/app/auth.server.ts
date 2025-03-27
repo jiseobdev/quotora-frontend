@@ -2,7 +2,7 @@ import { createCookie, UNSAFE_ErrorResponseImpl } from 'react-router';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
-export const authenticator = new Authenticator<string>();
+export const authenticator = new Authenticator<{ token: string; isActive: boolean }>();
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {
@@ -28,8 +28,8 @@ authenticator.use(
       );
     }
 
-    const data: { token: string } = await response.json();
-    return data.token as string;
+    const data: { token: string; isActive: boolean } = await response.json();
+    return data;
   }),
 );
 
