@@ -11,7 +11,7 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 
   const body = { emails, permission };
 
-  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/invite`, process.env.BACKEND_API_URL), {
+  const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/colleagues/invite`, process.env.BACKEND_API_URL), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
