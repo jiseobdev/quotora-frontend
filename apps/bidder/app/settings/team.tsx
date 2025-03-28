@@ -113,7 +113,7 @@ export default function Team() {
                     </div>
                   </div>
                   <div className="flex flex-row-reverse gap-3">
-                    <button type="submit" className="px-4 py-2.5 bg-[#4F46E5] text-white rounded-lg hover:bg-opacity-90 whitespace-nowrap">
+                    <button type="submit" className="px-4 py-2.5 bg-[#4F46E5] text-white rounded-lg hover:bg-opacity-90 whitespace-nowrap disabled:disabled:bg-gray-200 disabled:text-gray-400" disabled={memberIds.length === 0}>
                       My Team 추가
                     </button>
                     <DialogClose type="reset" className="px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
