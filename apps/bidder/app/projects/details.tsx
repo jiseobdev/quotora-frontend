@@ -15,8 +15,8 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
   const proposal = await fetchProposal(id, token);
-  const notices = await fetchNotices(proposal.rfpId, token);
-  const qnas = await fetchQnas(proposal.rfpId, id, token);
+  const notices = await fetchNotices(proposal.rfp.id, token);
+  const qnas = await fetchQnas(proposal.rfp.id, id, token);
 
   if (!proposal.nda) {
     return replace(`/projects/${id}/nda`);
