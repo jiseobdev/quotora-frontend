@@ -79,7 +79,7 @@ export default function Signin() {
   }, [actionData]);
 
   return (
-    <div id="signup-page" className="flex min-h-[100vh] bg-gray-50">
+    <main id="signup-page" className="flex min-h-[100vh] bg-gray-50">
       <div className="hidden lg:flex lg:w-1/2 bg-indigo-600 relative">
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="text-white space-y-6 max-w-lg">
@@ -200,6 +200,6 @@ export default function Signin() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </main>
   );
 }
