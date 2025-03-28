@@ -1,16 +1,15 @@
 import { data, Form, Link, replace, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import type { Route } from "./+types/nda";
 import { getAccessToken } from "~/auth.server";
-import { fetchProposal, fetchRfp } from "~/lib/fetch";
+import { fetchProposal } from "~/lib/fetch";
 import { format } from "date-fns";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
   const proposal = await fetchProposal(id, token);
-  const rfp = await fetchRfp(proposal.rfpId, token);
 
-  return data({ proposal, rfp });
+  return data({ proposal });
 }
 
 export async function action({ request, params: { id } }: Route.ActionArgs) {
@@ -37,7 +36,8 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 }
 
 export default function Nda() {
-  const { proposal, rfp } = useLoaderData<typeof loader>();
+  const { proposal } = useLoaderData<typeof loader>();
+  const { rfp } = proposal;
 
   return (
     <main className="px-4 sm:px-6 lg:px-8 py-6 min-h-[calc(100vh-var(--spacing)*16)]">

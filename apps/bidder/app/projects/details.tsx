@@ -1,7 +1,7 @@
 import { data, Form, Link, replace, UNSAFE_ErrorResponseImpl, useActionData, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
-import { fetchNotices, fetchProposal, fetchQnas, fetchRfp } from "~/lib/fetch";
+import { fetchNotices, fetchProposal, fetchQnas } from "~/lib/fetch";
 import { getDDay } from "~/lib/date";
 import { format } from "date-fns";
 import clsx from "clsx";
@@ -15,7 +15,6 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
   const proposal = await fetchProposal(id, token);
-  const rfp = await fetchRfp(proposal.rfpId, token);
   const notices = await fetchNotices(proposal.rfpId, token);
   const qnas = await fetchQnas(proposal.rfpId, id, token);
 
@@ -27,7 +26,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
     return replace(`/projects/${id}/rfp`);
   }
 
-  return data({ proposal, rfp, notices, qnas });
+  return data({ proposal, notices, qnas });
 }
 
 async function uploadFile(id: string | number, file: File, token?: string) {
@@ -67,7 +66,8 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 }
 
 export default function Details() {
-  const { proposal, rfp, notices, qnas } = useLoaderData<typeof loader>();
+  const { proposal, notices, qnas } = useLoaderData<typeof loader>();
+  const { rfp } = proposal;
   const fetcher = useFetcher<typeof action>();
   const { data: qnasData, Form: QnAsForm } = useFetcher<{ success: boolean }>();
 

@@ -57,6 +57,7 @@ interface Proposal {
   updatedAt: string;
   name: string;
   rfpId: number;
+  rfp: Rfp;
   ordererName: string;
   expectedSchedule: string;
   overview: string;
