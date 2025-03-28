@@ -192,7 +192,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">로펌명</th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">자문사명</th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">NDA동의 &amp; 응찰여부</th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">제안서</th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>

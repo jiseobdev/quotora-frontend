@@ -99,7 +99,7 @@ export default function List() {
               <th className="px-6 py-3 text-xs font-medium text-gray-500">최종수정일</th>
               <th className="px-6 py-3 text-xs font-medium text-gray-500">상태</th>
               <th className="px-6 py-3 text-xs font-medium text-gray-500">비용예상액</th>
-              <th className="px-6 py-3 text-xs font-medium text-gray-500">수신로펌 범위</th>
+              <th className="px-6 py-3 text-xs font-medium text-gray-500">수신 자문사 범위</th>
               <th className="px-6 py-3 text-xs font-medium text-gray-500">Actions</th>
             </tr>
           </thead>

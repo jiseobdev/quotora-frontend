@@ -101,8 +101,8 @@ export default function RfpForm({ rfp }: Props) {
             </button>
           </div>
           <div>
-            <label htmlFor="rawfirms" className="block text-sm font-medium text-gray-700 mb-2">수신로펌의 범위</label>
-            <textarea id="rawfirms" name="rawfirms" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5] h-32" placeholder="제안서를 받을 로펌의 이름이나 조건을 기재해주세요" defaultValue={rfp?.rawfirms.join(', ')}></textarea>
+            <label htmlFor="rawfirms" className="block text-sm font-medium text-gray-700 mb-2">수신 자문사의 범위</label>
+            <textarea id="rawfirms" name="rawfirms" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5] h-32" placeholder="제안서를 받을 자문사의 이름이나 조건을 기재해주세요" defaultValue={rfp?.rawfirms.join(', ')}></textarea>
           </div>
           <div className="flex justify-end space-x-4">
             <button type="button" className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">취소</button>

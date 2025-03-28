@@ -120,7 +120,7 @@ export default function List() {
                     <span className={`px-3 py-1 text-sm rounded-full ${STATUS_TO_CLASSNAME[rfp.status]}`}>{STATUS_TO_LABEL[rfp.status]}</span>
                   </div>
                   <div className="mt-4">
-                    <p className="text-sm text-gray-500">제안서 수신 로펌</p>
+                    <p className="text-sm text-gray-500">제안서 수신 자문사</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {rfp.rawfirms.map((firm) => (
                         <span key={firm} className="px-2 py-1 text-sm bg-gray-100 rounded">{firm}</span>
