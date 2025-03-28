@@ -1,6 +1,6 @@
 import { data, Link, useFetcher, useLoaderData, useNavigate } from "react-router";
 import type { Route } from "./+types/list";
-import { fetchColleagues, fetchRfps } from "~/lib/fetch";
+import { fetchRfps } from "~/lib/fetch";
 import { getAccessToken } from "~/auth.server";
 import { STATUS_TO_CLASSNAME, STATUS_TO_LABEL } from "./constants";
 import { format } from "date-fns";
@@ -15,13 +15,11 @@ export async function loader({ request }: Route.LoaderArgs) {
       .concat(...(await Promise.all(Object.keys(STATUS_TO_LABEL).map((status) => fetchRfps(status, token)))))
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
-  const colleagues = await fetchColleagues(token);
-
-  return data({ rfps, colleagues });
+  return data({ rfps });
 }
 
 export default function List() {
-  const { rfps = [], colleagues = [] } = useLoaderData<typeof loader>();
+  const { rfps = [] } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   const fetcher = useFetcher();
@@ -148,7 +146,7 @@ export default function List() {
           Create New RFP
         </Link>
       </div>
-      <InviteModal id={selectedId} open={modalOpened} values={emails} colleagues={colleagues} onOpenChange={setModalOpened} onValuesChange={setEmails} />
+      <InviteModal id={selectedId} open={modalOpened} values={emails} onOpenChange={setModalOpened} onValuesChange={setEmails} />
     </main>
   );
 }

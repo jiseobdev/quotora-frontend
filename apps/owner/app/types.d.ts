@@ -26,6 +26,10 @@ interface Rfp {
   updatedAt: string;
 }
 
+type Permission = User & {
+  permission: "READ" | "EDIT";
+}
+
 interface Proposal {
   id: number;
   lawfirmName: string;

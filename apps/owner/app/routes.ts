@@ -30,6 +30,7 @@ export default [
       route(':id/invite', './rfps/invite.tsx'),
       route(':id/comments', './rfps/comments.tsx'),
       route(':id/send', './rfps/send.tsx'),
+      route(':id/permissions', './rfps/permissions.tsx'),
       route(':id/finalize', './rfps/finalize.tsx'),
     ]),
 
@@ -37,6 +38,11 @@ export default [
       index('./settings/index.tsx'),
       route('account', './settings/account.tsx'),
       route('team', './settings/team.tsx'),
+    ]),
+
+    ...prefix('api', [
+      route('colleagues', './api/colleagues.tsx'),
+      route('current-user', './api/current-user.tsx'),
     ]),
   ]),
 ] satisfies RouteConfig;
