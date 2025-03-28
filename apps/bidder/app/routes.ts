@@ -7,7 +7,7 @@ export default [
     route('signin', './auth/signin.tsx'),
     route('signout', './auth/signout.tsx'),
     route('signup', './auth/signup.tsx'),
-    route('email-verification', './auth/email-verification.tsx'),
+    route('email-verification/:code', './auth/email-verification.tsx'),
     route('reset-password', './auth/reset-password.tsx'),
     route('request-reset-password', './auth/request-reset-password.tsx'),
     route('resend-verification-email', './auth/resend-verification-email.tsx'),
