@@ -2,7 +2,7 @@ import { getAccessToken } from "~/auth.server";
 import type { Route } from "./+types/team";
 import { data, Form, UNSAFE_ErrorResponseImpl, useLoaderData, useSubmit } from "react-router";
 import { fetchColleagues, fetchTeam } from "~/lib/fetch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogClose, DialogContent } from "~/components/ui/dialog";
 import { MultiSelector, MultiSelectorContent, MultiSelectorInput, MultiSelectorItem, MultiSelectorList, MultiSelectorTrigger } from "~/components/ui/multi-select";
 import { DialogTrigger } from "@radix-ui/react-dialog";
@@ -54,9 +54,14 @@ export default function Team() {
     e.preventDefault();
 
     await submit({ memberIds }, { method: "POST" });
-    setMemberIds([]);
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (!open) {
+      setMemberIds([]);
+    }
+  }, [open]);
 
   return (
     <main className="pt-20 px-6 min-h-[calc(100vh-var(--spacing)*16)]">
