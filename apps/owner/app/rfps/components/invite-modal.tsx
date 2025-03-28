@@ -47,13 +47,12 @@ export default function InviteModal({ id, open, values, colleagues, onOpenChange
                   values={values}
                   onValuesChange={onValuesChange}
                   loop
-                  className="max-w-xs"
                 >
                   <MultiSelectorTrigger>
                     <MultiSelectorInput placeholder="이메일 주소 입력" />
                   </MultiSelectorTrigger>
                   <MultiSelectorContent>
-                    <MultiSelectorList className="w-[calc(100%-88px)] mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <MultiSelectorList className="mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
                       {colleagues.map((colleague) => (
                         <MultiSelectorItem key={colleague.email} value={colleague.email}>
                           <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer">
@@ -71,12 +70,12 @@ export default function InviteModal({ id, open, values, colleagues, onOpenChange
                     </MultiSelectorList>
                   </MultiSelectorContent>
                 </MultiSelector>
-                <button className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 whitespace-nowrap">
+                {/* <button className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 whitespace-nowrap">
                   My Team 추가
-                </button>
+                </button> */}
               </div>
             </div>
-            <div className="mt-12 space-y-4 bg-gray-50 p-4 rounded-lg">
+            <div className="mt-6 space-y-4 bg-gray-50 p-4 rounded-lg">
               <p className="text-sm font-medium text-gray-700">권한 설정</p>
               <div className="space-y-3">
                 <label
