@@ -15,11 +15,18 @@ async function fetchDashboard(token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: { totalDraftRfps: number, totalBiddingRfps: number, totalClosedBiddingRfps: number } = await response.json();

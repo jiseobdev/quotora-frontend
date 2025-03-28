@@ -26,27 +26,34 @@ export async function action({ request }: Route.ActionArgs) {
   });
 
   if (!response.ok) {
-    const result: { code: string, errors: { field: string; value: string; reason: string }[] } = await response.json();
+    if (response.status >= 400 && response.status < 500) {
+      const result: { code: string, errors: { field: string; value: string; reason: string }[] } = await response.json();
 
-    if (result.errors && result.errors.length > 0) {
-      const errors = result.errors?.map(error => ({
-        [error.field]: error.reason,
-      }));
+      if (result.errors && result.errors.length > 0) {
+        const errors = result.errors?.map(error => ({
+          [error.field]: error.reason,
+        }));
 
-      return data({ success: false, errors: Object.fromEntries(errors.map((value) => [value.field, value.reason])) });
+        return data({ success: false, errors: Object.fromEntries(errors.map((value) => [value.field, value.reason])) });
+      }
+
+      if (result.code === 'err_account_not_activated') {
+        return data({ success: false, errors: { companyEmail: '이메일 인증이 필요합니다.' } as { [k: string]: string; } });
+      } else if (result.code === 'err_account_already_sign_up') {
+        return data({ success: false, errors: { companyEmail: '이미 등록된 이메일입니다.' } as { [k: string]: string; } });
+      }
+
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        { request: body, response: result },
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
     }
-
-    if (result.code === 'err_account_not_activated') {
-      return data({ success: false, errors: { companyEmail: '이메일 인증이 필요합니다.' } as { [k: string]: string; } });
-    } else if (result.code === 'err_account_already_sign_up') {
-      return data({ success: false, errors: { companyEmail: '이미 등록된 이메일입니다.' } as { [k: string]: string; } });
-    }
-
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      { request: body, response: result },
-    );
   }
 
   return data({ success: true, errors: undefined });

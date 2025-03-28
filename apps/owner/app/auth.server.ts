@@ -21,11 +21,18 @@ authenticator.use(
     });
 
     if (!response.ok) {
-      throw new UNSAFE_ErrorResponseImpl(
-        response.status,
-        response.statusText,
-        await response.json(),
-      );
+      if (response.status >= 400 && response.status < 500) {
+        throw new UNSAFE_ErrorResponseImpl(
+          response.status,
+          response.statusText,
+          { request: { companyEmail: email, password }, response: await response.text() },
+        );
+      } else {
+        throw new Error(
+          [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+          { cause: response }
+        );
+      }
     }
 
     const data: { token: string; isActive: boolean } = await response.json();

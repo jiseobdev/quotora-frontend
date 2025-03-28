@@ -30,11 +30,18 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      { request: { id, reason, method: request.method }, response: await response.json() },
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        { request: { id, reason, method: request.method }, response: await response.json() },
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   return replace(request.method === 'POST' ? `/projects/${id}` : '/projects');

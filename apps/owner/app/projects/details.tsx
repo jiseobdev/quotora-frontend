@@ -29,11 +29,18 @@ async function fetchProposals(id: string, token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: Proposal[] = await response.json();
@@ -51,11 +58,18 @@ async function fetchNotices(id: string, token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: Notice[] = await response.json();
@@ -74,11 +88,18 @@ async function fetchReviews(id: string, token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: Review[] = await response.json();

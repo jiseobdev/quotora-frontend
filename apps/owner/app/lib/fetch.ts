@@ -10,11 +10,18 @@ export async function fetchRfps(status: string, token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: Rfp[] = await response.json();
@@ -32,11 +39,18 @@ export async function fetchRfp(id: string, token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: Rfp = await response.json();
@@ -46,7 +60,6 @@ export async function fetchRfp(id: string, token?: string) {
 
 export async function fetchComments(id: string, token?: string) {
   const response = await fetch(new URL(`/api/v1/orderer/rfps/${id}/comments`, process.env.BACKEND_API_URL), {
-
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -55,11 +68,18 @@ export async function fetchComments(id: string, token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: Comment[] = await response.json();
@@ -77,11 +97,18 @@ export async function fetchQnas(id: string, proposalId: string, token?: string) 
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: QnA[] = await response.json();
@@ -91,7 +118,6 @@ export async function fetchQnas(id: string, proposalId: string, token?: string) 
 
 export async function fetchColleagues(token?: string) {
   const response = await fetch(new URL(`/api/v1/users/colleagues`, process.env.BACKEND_API_URL), {
-
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -100,11 +126,18 @@ export async function fetchColleagues(token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: User[] = await response.json();
@@ -114,7 +147,6 @@ export async function fetchColleagues(token?: string) {
 
 export async function fetchTeam(token?: string) {
   const response = await fetch(new URL(`/api/v1/teams`, process.env.BACKEND_API_URL), {
-
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -123,11 +155,18 @@ export async function fetchTeam(token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: User[] = await response.json();
@@ -137,7 +176,6 @@ export async function fetchTeam(token?: string) {
 
 export async function fetchCurrentUser(token?: string) {
   const response = await fetch(new URL(`/api/v1/users`, process.env.BACKEND_API_URL), {
-
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -146,11 +184,18 @@ export async function fetchCurrentUser(token?: string) {
   });
 
   if (!response.ok) {
-    throw new UNSAFE_ErrorResponseImpl(
-      response.status,
-      response.statusText,
-      null,
-    );
+    if (response.status >= 400 && response.status < 500) {
+      throw new UNSAFE_ErrorResponseImpl(
+        response.status,
+        response.statusText,
+        null,
+      );
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
+    }
   }
 
   const result: User = await response.json();

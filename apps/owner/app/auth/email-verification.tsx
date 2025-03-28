@@ -10,16 +10,23 @@ export async function loader({ params: { code } }: Route.ActionArgs) {
   });
 
   if (!response.ok) {
-    const error: { code: string; message: string } = await response.json();
+    if (response.status >= 400 && response.status < 500) {
+      const error: { code: string; message: string } = await response.json();
 
-    let message = '';
-    if (error.code === 'err_account_verification_code_not_found') {
-      message = '유효하지 않은 인증 코드입니다.';
-    } else if (error.code === 'err_account_verification_code_expired') {
-      message = '인증 코드가 만료되었습니다.';
+      let message = '';
+      if (error.code === 'err_account_verification_code_not_found') {
+        message = '유효하지 않은 인증 코드입니다.';
+      } else if (error.code === 'err_account_verification_code_expired') {
+        message = '인증 코드가 만료되었습니다.';
+      }
+
+      return data({ success: false, message: message || error.message });
+    } else {
+      throw new Error(
+        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+        { cause: response }
+      );
     }
-
-    return data({ success: false, message: message || error.message });
   }
 
   return data({ success: true, message: null });
