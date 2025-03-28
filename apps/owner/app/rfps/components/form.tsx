@@ -86,9 +86,9 @@ export default function RfpForm({ rfp }: Props) {
             <div className="space-y-4">
               {selectionCriteria.map((criteria, index) => (
                 <div key={index} className="flex items-center">
-                  <input name="selectionCriteriaNames" type="text" className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={criteria.name} onChange={(event) => handleInputChange(index, 'name', event)} />
+                  <input name="selectionCriteriaNames" type="text" className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={criteria.name} onChange={(event) => handleInputChange(index, 'name', event)} required />
                   <input type="range" className="flex-1 mx-4" min="0" max="100" defaultValue={criteria.weight} onChange={(event) => handleInputChange(index, 'weight', event)} />
-                  <input name="selectionCriteriaWeights" type="number" className="w-20 px-2 py-1 border border-gray-300 rounded" min="0" max="100" defaultValue={criteria.weight} onChange={(event) => handleInputChange(index, 'weight', event)} />%
+                  <input name="selectionCriteriaWeights" type="number" className="w-20 px-2 py-1 border border-gray-300 rounded" min="0" max="100" defaultValue={criteria.weight} onChange={(event) => handleInputChange(index, 'weight', event)} required />%
                   <button type="button" className="ml-2 text-red-500 hover:text-red-700" onClick={() => removeSelectionCriteria(index)}>
                     <i className="fa-solid fa-times"></i>
                   </button>

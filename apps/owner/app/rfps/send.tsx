@@ -79,22 +79,22 @@ export default function Send({ params: { id } }: Route.ComponentProps) {
             {rawfirms.map((rawfirm, index) => (
               <div key={index} className="flex flex-col gap-2">
                 {rawfirm.canFixName ? (
-                  <input name="rawfirmNames" type="text" value={rawfirm.name} className="flex-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" placeholder="추가 이메일" onChange={(e) => handleInputChange(index, "name", e)} />
+                  <input name="rawfirmNames" type="text" value={rawfirm.name} className="flex-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" placeholder="추가 자문사명" onChange={(e) => handleInputChange(index, "name", e)} />
                 ) : (
                   <>
-                    <label className="flex-1 block w-full px-4 py-2 text-sm font-medium text-gray-700">{rawfirm.name}</label>
+                    <label className="flex-1 block w-full px-4 py-2 font-medium text-gray-700">{rawfirm.name}</label>
                     <input name="rawfirmNames" type="hidden" value={rawfirm.name} />
                   </>
                 )}
                 {index === rawfirms.length - 1 ? (
                   <div className="flex flex-1 gap-2">
-                    <input name="rawfirmEmails" type="email" value={rawfirm.email} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" onChange={(e) => handleInputChange(index, "email", e)} />
+                    <input name="rawfirmEmails" type="email" value={rawfirm.email} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" placeholder={rawfirm.canFixName ? '추가 자문사 이메일' : `${rawfirm.name} 이메일`} onChange={(e) => handleInputChange(index, "email", e)} />
                     <button className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200" onClick={addRawfirms}>
                       <i className="fa-solid fa-plus"></i>
                     </button>
                   </div>
                 ) : (
-                  <input name="rawfirmEmails" type="email" value={rawfirm.email} className="flex-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" onChange={(e) => handleInputChange(index, "email", e)} />
+                  <input name="rawfirmEmails" type="email" value={rawfirm.email} className="flex-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" placeholder={rawfirm.canFixName ? '추가 자문사 이메일' : `${rawfirm.name} 이메일`} onChange={(e) => handleInputChange(index, "email", e)} />
                 )}
               </div>
             ))}
