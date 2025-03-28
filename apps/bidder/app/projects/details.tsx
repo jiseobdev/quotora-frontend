@@ -17,11 +17,14 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const proposal = await fetchProposal(id, token);
   const rfp = await fetchRfp(proposal.rfpId, token);
   const notices = await fetchNotices(proposal.rfpId, token);
-
   const qnas = await fetchQnas(proposal.rfpId, id, token);
 
-  if (!proposal.nda || !proposal.participate) {
-    return replace('/projects');
+  if (!proposal.nda) {
+    return replace(`/projects/${id}/nda`);
+  }
+
+  if (!proposal.participate) {
+    return replace(`/projects/${id}/rfp`);
   }
 
   return data({ proposal, rfp, notices, qnas });
