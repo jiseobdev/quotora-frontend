@@ -87,10 +87,12 @@ export default function List() {
                           <p className="text-sm text-gray-500">RFP 수신일</p>
                           <p className="text-sm font-medium">{format(new Date(proposal.createdAt), 'yyyy.MM.dd')}</p>
                         </div>
-                        <div>
-                          <p className="text-sm text-gray-500">응찰일</p>
-                          <p className="text-sm font-medium">{format(new Date(proposal.sentAt), 'yyyy.MM.dd')}</p>
-                        </div>
+                        {proposal.sentAt && (
+                          <div>
+                            <p className="text-sm text-gray-500">응찰일</p>
+                            <p className="text-sm font-medium">{format(new Date(proposal.sentAt), 'yyyy.MM.dd')}</p>
+                          </div>
+                        )}
                         <div>
                           <p className="text-sm text-gray-500">입찰마감일</p>
                           <p className="text-sm font-medium">2025.03.01</p>
