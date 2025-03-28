@@ -71,10 +71,8 @@ export default function Team() {
               <Form method="POST" onSubmit={handleSubmit}>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-semibold">팀 멤버 추가하기</h2>
-                  <DialogClose>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <i className="fa-solid fa-xmark text-xl"></i>
-                    </button>
+                  <DialogClose type="reset" className="text-gray-400 hover:text-gray-600">
+                    <i className="fa-solid fa-xmark text-xl"></i>
                   </DialogClose>
                 </div>
                 <div className="space-y-6">
@@ -113,10 +111,8 @@ export default function Team() {
                     <button type="submit" className="px-4 py-2.5 bg-[#4F46E5] text-white rounded-lg hover:bg-opacity-90 whitespace-nowrap">
                       My Team 추가
                     </button>
-                    <DialogClose>
-                      <button className="px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        취소
-                      </button>
+                    <DialogClose type="reset" className="px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+                      취소
                     </DialogClose>
                   </div>
                 </div>

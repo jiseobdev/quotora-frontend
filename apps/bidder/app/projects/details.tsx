@@ -282,7 +282,7 @@ export default function Details() {
                   <Form method="POST" encType="multipart/form-data">
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="text-lg font-medium text-gray-900">파일 첨부</h3>
-                      <DialogClose className="text-gray-400 hover:text-gray-500">
+                      <DialogClose type="reset" className="text-gray-400 hover:text-gray-500">
                         <i className="text-xl" data-fa-i2svg=""><svg className="svg-inline--fa fa-xmark" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="xmark" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg=""><path fill="currentColor" d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"></path></svg></i>
                       </DialogClose>
                     </div>
@@ -328,7 +328,7 @@ export default function Details() {
                       </FileUploaderContent>
                     </FileUploader>
                     <div className="mt-6 flex justify-end space-x-3">
-                      <DialogClose className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                      <DialogClose type="reset" className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
                         취소
                       </DialogClose>
                       <button type="submit" className="px-4 py-2 bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] transition-colors disabled:bg-gray-200 disabled:text-gray-400" disabled={!files || files.length === 0 || fetcher.state !== 'idle'}>

@@ -36,10 +36,8 @@ export default function InviteModal({ id, open, values, colleagues, onOpenChange
         <fetcher.Form action={`/rfps/${id}/invite`} method="POST" onSubmit={handleSubmit}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">팀과 공유하기</h2>
-            <DialogClose>
-              <button className="text-gray-400 hover:text-gray-600">
-                <i className="fa-solid fa-xmark text-xl"></i>
-              </button>
+            <DialogClose type="reset" className="text-gray-400 hover:text-gray-600">
+              <i className="fa-solid fa-xmark text-xl"></i>
             </DialogClose>
           </div>
           <div className="space-y-6">
@@ -108,10 +106,8 @@ export default function InviteModal({ id, open, values, colleagues, onOpenChange
               >
                 초대장 보내기
               </button>
-              <DialogClose>
-                <button className="px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
-                  취소
-                </button>
+              <DialogClose type="reset" className="px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+                취소
               </DialogClose>
             </div>
           </div>
