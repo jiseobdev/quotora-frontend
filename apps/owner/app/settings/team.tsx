@@ -95,7 +95,7 @@ export default function Team() {
                           <MultiSelectorList className="mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
                             {colleagues.map((colleague) => (
                               <MultiSelectorItem key={colleague.id} value={colleague.id.toString()}>
-                                <div className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer">
+                                <div className="w-full flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer">
                                   <img
                                     src={colleague.profileImage}
                                     className="w-8 h-8 rounded-full"
