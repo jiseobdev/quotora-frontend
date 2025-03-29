@@ -33,7 +33,7 @@ async function uploadFile(id: string | number, file: File, token?: string) {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(new URL('/api/v1/orderer/rfps', process.env.BACKEND_API_URL), {
+  const response = await fetch(new URL(`/api/v1/bidder/proposals/${id}/file-upload`, process.env.BACKEND_API_URL), {
     method: 'POST',
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -318,7 +318,7 @@ export default function Details() {
                             <p className="font-medium">파일을 드래그하여 업로드하세요</p>
                             <p className="text-gray-500">또는</p>
                           </div>
-                          <button className="px-4 py-2 text-sm text-[#4F46E5] border border-[#4F46E5] rounded-md hover:bg-[#4F46E5] hover:text-white transition-colors">
+                          <button type="button" className="px-4 py-2 text-sm text-[#4F46E5] border border-[#4F46E5] rounded-md hover:bg-[#4F46E5] hover:text-white transition-colors">
                             파일 선택하기
                           </button>
                         </div>
