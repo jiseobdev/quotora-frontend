@@ -1,6 +1,6 @@
 import type { Route } from "./+types/rfp";
 import { getAccessToken } from "~/auth.server";
-import { fetchProposal } from "~/lib/fetch";
+import { fetchCurrentUser, fetchProposal } from "~/lib/fetch";
 import { data, Form, replace, UNSAFE_ErrorResponseImpl, useLoaderData } from "react-router";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from "~/components/ui/alert-dialog";
 import { getDDay } from "~/lib/date";
@@ -9,9 +9,10 @@ import { nl2br } from "~/lib/string";
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
+  const user = await fetchCurrentUser(token);
   const proposal = await fetchProposal(id, token);
 
-  return data({ proposal });
+  return data({ user, proposal });
 }
 
 export async function action({ request, params: { id } }: Route.ActionArgs) {
@@ -48,7 +49,7 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 }
 
 export default function Rfp() {
-  const { proposal } = useLoaderData<typeof loader>();
+  const { user, proposal } = useLoaderData<typeof loader>();
   const { rfp } = proposal;
 
   return (
@@ -119,7 +120,7 @@ export default function Rfp() {
                     <Form method="DELETE" className="p-6">
                       <div className="text-center mb-6">
                         <h3 className="text-lg font-medium text-gray-900">
-                          {proposal.ordererName}가 {proposal.lawfirmName}님의 제안서를 기다리고 있습니다.
+                          {rfp.companyName}가 {user.name}님의 제안서를 기다리고 있습니다.
                         </h3>
                         <p className="mt-2 text-sm text-gray-600">
                           정말 제안서를 제출하지 않으실건가요? 이유를 알려주실 수 있을까요?
@@ -135,7 +136,7 @@ export default function Rfp() {
                           <label htmlFor="other" className="ml-3 text-sm text-gray-700">기타 사유</label>
                         </div>
                         <div className="mt-3">
-                          <textarea name="reason" className="w-full rounded-md border-gray-300 shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm" rows={3} placeholder="기타 사유를 입력해주세요"></textarea>
+                          <textarea name="reason" className="w-full px-4 py-2 rounded-md border-gray-300 shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm" rows={3} placeholder="기타 사유를 입력해주세요"></textarea>
                         </div>
                       </div>
                       <div className="mt-6 flex justify-end space-x-3">

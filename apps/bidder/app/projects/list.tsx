@@ -80,8 +80,8 @@ export default function List() {
                 <div key={proposal.id} className="bg-white shadow rounded-lg p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className="text-lg font-medium text-[#4F46E5]">{proposal.name}</h3>
-                      <p className="mt-1 text-sm text-gray-600">발주사: {proposal.ordererName}</p>
+                      <h3 className="text-lg font-medium text-[#4F46E5]">{proposal.rfp.name}</h3>
+                      <p className="mt-1 text-sm text-gray-600">발주사: {proposal.rfp.companyName}</p>
                       <div className="mt-2 grid grid-cols-4 gap-4">
                         <div>
                           <p className="text-sm text-gray-500">RFP 수신일</p>

@@ -51,8 +51,8 @@ export default function Nda() {
       <div className="bg-white shadow rounded-lg p-6">
         <div className="flex flex-col">
           <div className="mb-6">
-            <h3 className="text-lg font-medium text-[#4F46E5]">{proposal.name}</h3>
-            <p className="mt-1 text-sm text-gray-600">발주사: {proposal.ordererName}</p>
+            <h3 className="text-lg font-medium text-[#4F46E5]">{rfp.name}</h3>
+            <p className="mt-1 text-sm text-gray-600">발주사: {rfp.companyName}</p>
             <div className="mt-2 grid grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-gray-500">RFP 수신일</p>
@@ -71,7 +71,7 @@ export default function Nda() {
           <div className="bg-gray-50 p-4 rounded-lg mb-4">
             <h4 className="font-medium mb-2">비밀유지 서약서 (Non-Disclosure Agreement)</h4>
             <div className="text-sm text-gray-600 space-y-2">
-              <p>본인은 [데이터센터 구축 프로젝트](이하 "입찰")과 관련하여 제공받는 모든 정보(이하 "비밀정보")가 <strong>삼성전자(이하 "발주자")</strong>의 기밀 정보임을 인정하며, 이에 대한 비밀 유지 의무를 다음과 같이 서약합니다.</p>
+              <p>본인은 [{rfp.name}](이하 "입찰")과 관련하여 제공받는 모든 정보(이하 "비밀정보")가 <strong>{rfp.companyName}(이하 "발주자")</strong>의 기밀 정보임을 인정하며, 이에 대한 비밀 유지 의무를 다음과 같이 서약합니다.</p>
               <ol className="list-decimal pl-4 space-y-1">
                 <li>본인은 본 입찰과 관련하여 제공되는 모든 비밀정보를 철저히 보호하고, 발주자의 사전 서면 동의 없이 제3자에게 공개하지 않습니다.</li>
                 <li>본인은 비밀정보를 본 입찰의 검토 및 응찰 목적 이외의 용도로 사용하지 않습니다.</li>

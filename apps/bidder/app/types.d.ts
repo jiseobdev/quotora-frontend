@@ -10,6 +10,7 @@ interface User {
 
 interface Rfp {
   id: number;
+  companyName: string;
   name: string;
   overview: string;
   desiredLegalAdvice: string;
