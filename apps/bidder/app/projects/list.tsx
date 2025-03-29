@@ -87,19 +87,19 @@ export default function List() {
                           <p className="text-sm text-gray-500">RFP 수신일</p>
                           <p className="text-sm font-medium">{format(new Date(proposal.createdAt), 'yyyy.MM.dd')}</p>
                         </div>
-                        {proposal.sentAt && (
+                        {(proposal.updatedAt && proposal.files.length > 0) && (
                           <div>
                             <p className="text-sm text-gray-500">응찰일</p>
-                            <p className="text-sm font-medium">{format(new Date(proposal.sentAt), 'yyyy.MM.dd')}</p>
+                            <p className="text-sm font-medium">{format(new Date(proposal.updatedAt), 'yyyy.MM.dd')}</p>
                           </div>
                         )}
                         <div>
                           <p className="text-sm text-gray-500">입찰마감일</p>
-                          <p className="text-sm font-medium">2025.03.01</p>
+                          <p className="text-sm font-medium">{format(new Date(proposal.rfp.submissionDeadline), 'yyyy.MM.dd')}</p>
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">낙찰통보 예정일</p>
-                          <p className="text-sm font-medium">2025.03.15</p>
+                          <p className="text-sm font-medium">{format(new Date(proposal.rfp.selectionNotificationDate), 'yyyy.MM.dd')}</p>
                         </div>
                       </div>
                     </div>
