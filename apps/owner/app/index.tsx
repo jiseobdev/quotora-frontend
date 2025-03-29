@@ -120,6 +120,9 @@ export default function Index() {
             <div>
               <h3 className="text-xl font-bold mb-4">Quotora</h3>
               <p className="text-[#D6D2F2] break-keep">효율적인 입찰 관리를 위한 업무 지원 솔루션</p>
+              <p className="text-[#D6D2F2] break-keep">
+                고객 문의 <a href="mailto:support@quotora.xyz" className="text-[#D6D2F2]">support@quotora.xyz</a>
+              </p>
             </div>
             <div>
               <h4 className="font-bold mb-4">Quick Links</h4>
