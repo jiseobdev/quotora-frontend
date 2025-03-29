@@ -119,7 +119,7 @@ export default function Index() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <h3 className="text-xl font-bold mb-4">Quotora</h3>
-              <p className="text-[#D6D2F2] break-keep">더 스마트한 법무팀을 위한 솔루션</p>
+              <p className="text-[#D6D2F2] break-keep">효율적인 입찰 관리를 위한 업무 지원 솔루션</p>
             </div>
             <div>
               <h4 className="font-bold mb-4">Quick Links</h4>
