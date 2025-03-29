@@ -10,6 +10,8 @@ import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "
 import { useEffect, useRef, useState } from "react";
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import { MAX_FILES } from "./constants";
+import type { Readable } from "node:stream";
+import type { SquareFunction } from "lucide-react";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -29,6 +31,27 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   return data({ proposal, notices, qnas });
 }
 
+async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let done = false;
+
+  while (!done) {
+    const { value, done: readerDone } = await reader.read();
+    if (value) {
+      chunks.push(value);
+    }
+    done = readerDone;
+  }
+
+  return Buffer.concat(chunks);
+}
+
+async function convertToFile(fileUpload: FileUpload) {
+  const buffer = await streamToBuffer(fileUpload.stream());
+  return new File([buffer], fileUpload.name, { type: fileUpload.type });
+}
+
 async function uploadFile(id: string | number, file: File, token?: string) {
   const formData = new FormData();
   formData.append('file', file);
@@ -36,7 +59,6 @@ async function uploadFile(id: string | number, file: File, token?: string) {
   const response = await fetch(new URL(`/api/v1/bidder/proposals/${id}/file-upload`, process.env.BACKEND_API_URL), {
     method: 'POST',
     headers: {
-      'Content-Type': 'multipart/form-data',
       ...(token && { Authorization: `Bearer ${token}` }),
     },
     body: formData,
@@ -56,8 +78,6 @@ async function uploadFile(id: string | number, file: File, token?: string) {
       );
     }
   }
-
-  return response.json();
 }
 
 export async function action({ request, params: { id } }: Route.ActionArgs) {
@@ -65,7 +85,8 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 
   await parseFormData(request, async (fileUpload: FileUpload) => {
     if (fileUpload.fieldName === "file") {
-      await uploadFile(id, fileUpload, token);
+      const file = await convertToFile(fileUpload);
+      await uploadFile(id, file, token);
     }
   });
 
@@ -106,6 +127,12 @@ export default function Details() {
       qnasFormRef.current.reset();
     }
   }, [qnasData]);
+
+  useEffect(() => {
+    if (!modalOpened) {
+      setFiles(null);
+    }
+  }, [modalOpened]);
 
   return (
     <main id="project-content" className="py-6">
@@ -289,7 +316,7 @@ export default function Details() {
                   제안서 등 파일 업로드하기
                 </DialogTrigger>
                 <DialogContent className="bg-white rounded-lg min-w-[500px] max-w-fit p-6">
-                  <Form method="POST" encType="multipart/form-data">
+                  <fetcher.Form method="POST" encType="multipart/form-data">
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="text-lg font-medium text-gray-900">파일 첨부</h3>
                       <DialogClose type="reset" className="text-gray-400 hover:text-gray-500">
@@ -345,7 +372,7 @@ export default function Details() {
                         전송하기
                       </button>
                     </div>
-                  </Form>
+                  </fetcher.Form>
                 </DialogContent>
               </Dialog>
             </div>
