@@ -20,6 +20,8 @@ export default [
       route(':id/reviews', './projects/reviews.tsx'),
       route(':id/notices', './projects/notices.tsx'),
       route(':id/proposals/:proposalId/qnas', './projects/qnas.tsx'),
+      route(':id/proposals/:proposalId/select', './projects/select.tsx'),
+      route(':id/proposals/:proposalId/unselect', './projects/unselect.tsx'),
     ]),
 
     ...prefix('rfps', [

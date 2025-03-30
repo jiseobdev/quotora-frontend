@@ -5,6 +5,7 @@ import { differenceInCalendarDays, format } from "date-fns";
 import { fetchQnas, fetchRfp } from "~/lib/fetch";
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
+import { PROPOSAL_STATUS_TO_LABEL } from "./constants";
 
 function getDDay(targetDate: Date): string {
   const today = new Date();
@@ -141,13 +142,54 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
 
 export default function Details({ params: { id } }: Route.ComponentProps) {
   const loaderData = useLoaderData<typeof loader>();
-  const { data: reviewsData, Form: ReviewsForm, submit: submitReview } = useFetcher<{ reviews: Review[] }>();
+  const { data: reviewsData, Form: ReviewsForm } = useFetcher<{ reviews: Review[] }>();
   const { data: noticesData, Form: NoticesForm } = useFetcher<{ notices: Notice[] }>();
-  const { data: qnasData, Form: QnAsForm } = useFetcher<{ success: boolean; proposalId: string | number; }>();
+  const { data: selectsData, submit: selectsSubmit } = useFetcher<{ success: boolean }>();
+  const { data: qnasData, Form: QnAsForm, submit: submitQnAs } = useFetcher<{ success: boolean; proposalId: string | number; }>();
 
   const { user, rfp, proposals, qnas } = loaderData;
   const notices = noticesData?.notices ?? loaderData.notices;
   const reviews = reviewsData?.reviews ?? loaderData.reviews;
+
+  const participatedProposals = proposals.filter((proposal) => proposal.nda && proposal.participate);
+
+  const selectProposal = async (proposalId: number) => {
+    const selectedProposal = participatedProposals.filter((proposal) => proposal.id === proposalId)[0];
+
+    await selectsSubmit(null, { action: `./proposals/${proposalId}/select`, method: 'POST' });
+    await submitQnAs({
+      content: `안녕하세요.\
+저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, [${selectedProposal.lawfirmName}]님을 선정하게 되었음을 기쁜 마음으로 알려드립니다. 함께 진행할 수 있게 되어 매우 기대됩니다.\
+계약 조건을 반영한 자문 계약서를 보내주시면 초안을 검토한 후 다시 연락드리겠습니다.\
+감사합니다.\
+[${rfp.companyName}}] 드림`
+    }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
+
+    const restProposals = participatedProposals.filter((proposal) => proposal.id !== proposalId);
+
+    for (const proposal of restProposals) {
+      await selectsSubmit(null, { action: `./proposals/${proposal.id}/unselect`, method: 'POST' });
+      await submitQnAs({
+        content: `안녕하세요.\
+저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, 이번에는 함께 진행할 수 없음을 알려드립니다. 관심 가져주시고 시간을 내어주셔서 감사합니다.\
+추후 다른 기회가 있을 때 다시 연락드리겠습니다.\
+감사합니다.\
+[${rfp.companyName}}] 드림`
+      }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
+    }
+  };
+  const unselectProposal = async (proposalId: number) => {
+    const unselectedProposal = participatedProposals.filter((proposal) => proposal.id === proposalId)[0];
+
+    await selectsSubmit(null, { action: `./proposals/${unselectedProposal.id}/unselect`, method: 'POST' });
+    await submitQnAs({
+      content: `안녕하세요.\
+저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, 이번에는 함께 진행할 수 없음을 알려드립니다. 관심 가져주시고 시간을 내어주셔서 감사합니다.\
+추후 다른 기회가 있을 때 다시 연락드리겠습니다.\
+감사합니다.\
+[${rfp.companyName}}] 드림`
+    }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
+  };
 
   const noticesFormRef = useRef<HTMLFormElement>(null);
 
@@ -224,7 +266,13 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
               <tbody className="bg-white divide-y divide-gray-200">
                 {proposals.map((proposal) => (
                   <tr key={proposal.id}>
-                    <td className="px-4 py-4">{proposal.lawfirmName}</td>
+                    <td className="px-4 py-4">
+                      {(proposal.nda && proposal.participate) ? (
+                        <Link to={{ hash: `#${proposal.id}` }}>{proposal.lawfirmName}</Link>
+                      ) : (
+                        proposal.lawfirmName
+                      )}
+                    </td>
                     <td className="px-4 py-4 text-center">
                       {proposal.nda ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
                       &nbsp;/&nbsp;
@@ -235,12 +283,26 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                         <td className="px-4 py-4 text-center">
                           {(proposal.files.length ?? 0) > 0 ? (<span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">제출완료</span>) : (<span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">미제출</span>)}
                         </td>
-                        <td className="px-4 py-4 text-center"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{proposal.status}</span></td>
+                        <td className="px-4 py-4 text-center"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{PROPOSAL_STATUS_TO_LABEL[proposal.status]}</span></td>
                         <td className="px-4 py-4 text-center">
-                          <div className="flex justify-center gap-2">
-                            <button className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600">Y</button>
-                            <button className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600">N</button>
-                          </div>
+                          {proposal.status === 'REVIEWING' ? (
+                            <div className="flex justify-center gap-2">
+                              <button
+                                type="button"
+                                className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600"
+                                onClick={() => selectProposal(proposal.id)}
+                              >
+                                Y
+                              </button>
+                              <button
+                                type="button"
+                                className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600"
+                                onClick={() => unselectProposal(proposal.id)}
+                              >
+                                N
+                              </button>
+                            </div>
+                          ) : '-'}
                         </td>
                         <td className="px-4 py-4 text-center">
                           <button className="px-3 py-1 text-xs bg-[#4F46E5] text-white rounded-md hover:bg-[#4338CA] disabled:bg-gray-200 disabled:text-gray-400" disabled>
@@ -261,8 +323,8 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
             </table>
           </div>
           <div id="communication-section" className="mt-6 space-y-4">
-            {proposals.filter((proposal) => proposal.nda && proposal.participate).map((proposal) => (
-              <div key={proposal.id} className="bg-white rounded-lg shadow-sm">
+            {participatedProposals.map((proposal) => (
+              <div key={proposal.id} id={proposal.id.toString()} className="bg-white rounded-lg shadow-sm">
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-lg font-medium">{proposal.lawfirmName} 제안서</h3>

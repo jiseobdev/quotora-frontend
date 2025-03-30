@@ -11,6 +11,7 @@ interface User {
 
 interface Rfp {
   id: number;
+  companyName: string;
   name: string;
   overview: string;
   desiredLegalAdvice: string;
@@ -51,7 +52,13 @@ interface Proposal {
   sentAt: string;
 }
 
-type ProposalStatus = 'SENT' | 'ONGOING_BIDDING' | 'COMPLETED_BIDDING';
+type ProposalStatus =
+  'SENT' |
+  'PENDING' |
+  'WRITING' |
+  'REVIEWING' |
+  'SELECTED' |
+  'REJECTED';
 
 interface ProposalFile {
   id: number;
