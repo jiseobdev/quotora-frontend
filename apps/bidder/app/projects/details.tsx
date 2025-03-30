@@ -1,4 +1,4 @@
-import { data, Form, Link, replace, UNSAFE_ErrorResponseImpl, useActionData, useFetcher, useLoaderData } from "react-router";
+import { data, Link, replace, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { fetchNotices, fetchProposal, fetchQnas } from "~/lib/fetch";
@@ -10,8 +10,6 @@ import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "
 import { useEffect, useRef, useState } from "react";
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import { MAX_FILES } from "./constants";
-import type { Readable } from "node:stream";
-import type { SquareFunction } from "lucide-react";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
