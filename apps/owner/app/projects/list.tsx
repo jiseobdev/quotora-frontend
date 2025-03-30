@@ -40,7 +40,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const dashboard = await fetchDashboard(token);
   const rfps =
     ([] as Rfp[])
-      .concat(...(await Promise.all(Object.keys(STATUS_TO_LABEL).map((status) => fetchRfps(status, token)))))
+      .concat(...(await Promise.all(['BIDDING', 'CLOSED'].map((status) => fetchRfps(status, token)))))
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return data({
