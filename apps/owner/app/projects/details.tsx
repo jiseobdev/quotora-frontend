@@ -227,7 +227,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                     <td className="px-4 py-4">{proposal.lawfirmName}</td>
                     <td className="px-4 py-4 text-center">
                       {proposal.nda ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
-                      /
+                      &nbsp;/&nbsp;
                       {proposal.participate ? (<i className="fa-solid fa-check text-green-500"></i>) : (<i className="fa-solid fa-xmark text-red-500"></i>)}
                     </td>
                     {proposal.nda && proposal.participate ?
