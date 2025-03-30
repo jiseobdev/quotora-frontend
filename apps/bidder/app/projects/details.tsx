@@ -314,7 +314,7 @@ export default function Details() {
                   제안서 등 파일 업로드하기
                 </DialogTrigger>
                 <DialogContent className="bg-white rounded-lg min-w-[500px] max-w-fit p-6">
-                  <fetcher.Form method="POST" encType="multipart/form-data">
+                  <fetcher.Form action="." method="POST" encType="multipart/form-data">
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="text-lg font-medium text-gray-900">파일 첨부</h3>
                       <DialogClose type="reset" className="text-gray-400 hover:text-gray-500">
