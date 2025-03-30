@@ -19,8 +19,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function Layout() {
   const location = useLocation();
 
-  const isSettingsActive = location.pathname.startsWith('/settings');
-
   return (
     <div className="flex min-h-screen bg-gray-50">
       <div id="sidebar" className="hidden md:flex md:w-64 md:flex-col fixed h-full">

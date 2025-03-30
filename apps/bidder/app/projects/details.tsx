@@ -1,4 +1,4 @@
-import { data, Link, replace, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react-router";
+import { data, Form, Link, replace, UNSAFE_ErrorResponseImpl, useActionData, useFetcher, useLoaderData, useNavigation } from "react-router";
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { fetchNotices, fetchProposal, fetchQnas } from "~/lib/fetch";
@@ -29,73 +29,73 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   return data({ proposal, notices, qnas });
 }
 
-async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
-  const reader = stream.getReader();
-  const chunks: Uint8Array[] = [];
-  let done = false;
+// async function streamToBuffer(stream: ReadableStream<Uint8Array>): Promise<Buffer> {
+//   const reader = stream.getReader();
+//   const chunks: Uint8Array[] = [];
+//   let done = false;
 
-  while (!done) {
-    const { value, done: readerDone } = await reader.read();
-    if (value) {
-      chunks.push(value);
-    }
-    done = readerDone;
-  }
+//   while (!done) {
+//     const { value, done: readerDone } = await reader.read();
+//     if (value) {
+//       chunks.push(value);
+//     }
+//     done = readerDone;
+//   }
 
-  return Buffer.concat(chunks);
-}
+//   return Buffer.concat(chunks);
+// }
 
-async function convertToFile(fileUpload: FileUpload) {
-  const buffer = await streamToBuffer(fileUpload.stream());
-  return new File([buffer], fileUpload.name, { type: fileUpload.type });
-}
+// async function convertToFile(fileUpload: FileUpload) {
+//   const buffer = await streamToBuffer(fileUpload.stream());
+//   return new File([buffer], fileUpload.name, { type: fileUpload.type });
+// }
 
-async function uploadFile(id: string | number, file: File, token?: string) {
-  const formData = new FormData();
-  formData.append('file', file);
+// async function uploadFile(id: string | number, file: File, token?: string) {
+//   const formData = new FormData();
+//   formData.append('file', file);
 
-  const response = await fetch(new URL(`/api/v1/bidder/proposals/${id}/file-upload`, process.env.BACKEND_API_URL), {
-    method: 'POST',
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-    body: formData,
-  });
+//   const response = await fetch(new URL(`/api/v1/bidder/proposals/${id}/file-upload`, process.env.BACKEND_API_URL), {
+//     method: 'POST',
+//     headers: {
+//       ...(token && { Authorization: `Bearer ${token}` }),
+//     },
+//     body: formData,
+//   });
 
-  if (!response.ok) {
-    if (response.status >= 400 && response.status < 500) {
-      throw new UNSAFE_ErrorResponseImpl(
-        response.status,
-        response.statusText,
-        { request: file, response: await response.text() },
-      );
-    } else {
-      throw new Error(
-        [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
-        { cause: response }
-      );
-    }
-  }
-}
+//   if (!response.ok) {
+//     if (response.status >= 400 && response.status < 500) {
+//       throw new UNSAFE_ErrorResponseImpl(
+//         response.status,
+//         response.statusText,
+//         { request: file, response: await response.text() },
+//       );
+//     } else {
+//       throw new Error(
+//         [response.status, response.statusText, await response.text()].filter(Boolean).join(' '),
+//         { cause: response }
+//       );
+//     }
+//   }
+// }
 
-export async function action({ request, params: { id } }: Route.ActionArgs) {
-  const token = await getAccessToken(request);
+// export async function action({ request, params: { id } }: Route.ActionArgs) {
+//   const token = await getAccessToken(request);
 
-  await parseFormData(request, async (fileUpload: FileUpload) => {
-    if (fileUpload.fieldName === "file") {
-      const file = await convertToFile(fileUpload);
-      await uploadFile(id, file, token);
-    }
-  });
+//   // await parseFormData(request.clone(), async (fileUpload: FileUpload) => {
+//   //   if (fileUpload.fieldName === "file") {
+//   //     const file = await convertToFile(fileUpload);
+//   //     await uploadFile(id, file, token);
+//   //   }
+//   // });
 
-  return data({ success: true })
-}
+//   return data({ success: true })
+// }
 
 export default function Details() {
   const { proposal, notices, qnas } = useLoaderData<typeof loader>();
   const { rfp } = proposal;
-  const fetcher = useFetcher<typeof action>();
   const { data: qnasData, Form: QnAsForm } = useFetcher<{ success: boolean }>();
+  const fetcher = useFetcher<{ success: boolean }>();
 
   let step = 0;
   if (proposal.status === 'COMPLETED_BIDDING') {
@@ -131,8 +131,6 @@ export default function Details() {
       setFiles(null);
     }
   }, [modalOpened]);
-
-  console.log(qnas);
 
   return (
     <main id="project-content" className="py-6">
@@ -230,7 +228,7 @@ export default function Details() {
                     <h4 className="text-sm font-medium mb-2">추가 파일</h4>
                     <div className="flex flex-col gap-2">
                       {proposal.files.map((file) => (
-                        <div className="flex items-center justify-between">
+                        <div key={file.id} className="flex items-center justify-between">
                           <div className="flex items-center">
                             <i className={`text-[#4F46E5] mr-2 fa-regular ${'pdf,docx,xlsx'.includes(file.name.split('.').at(-1) ?? 'undefined') ? `fa-file-${file.name.split('.').at(-1)}` : 'fa-file'}`}></i>
                             <span className="text-sm">{file.name}</span>
@@ -251,20 +249,20 @@ export default function Details() {
             <div className="flex flex-col gap-4">
               {qnas.map((qna) => (
                 <div key={qna.question.id} className="flex flex-col space-y-3">
-                  <div className={clsx('p-4 rounded-lg', qna.question.user.companyName === proposal.ordererName ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
-                    <div className={clsx('flex justify-between items-center mb-2', qna.question.user.companyName === proposal.ordererName ? 'text-gray-600' : 'text-blue-600')}>
+                  <div className={clsx('p-4 rounded-lg', qna.question.user.type !== 'BIDDER' ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
+                    <div className={clsx('flex justify-between items-center mb-2', qna.question.user.type !== 'BIDDER' ? 'text-gray-600' : 'text-blue-600')}>
                       <span className="text-xs">
-                        {qna.question.user.companyName === proposal.ordererName ? '발주자' : '입찰자'} 질의 ({format(new Date(qna.question.createdAt), 'yyyy.MM.dd')})
+                        {qna.question.user.type !== 'BIDDER' ? '발주자' : '입찰자'} 질의 ({format(new Date(qna.question.createdAt), 'yyyy.MM.dd')})
                       </span>
-                      <i className={clsx('fa-solid', qna.question.user.companyName === proposal.ordererName ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
+                      <i className={clsx('fa-solid', qna.question.user.type !== 'BIDDER' ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
                     </div>
                     <p className="text-sm text-gray-700">{qna.question.content}</p>
                   </div>
                   {qna.answer && (
-                    <div className={clsx('p-4 rounded-lg', qna.answer.user.companyName === proposal.ordererName ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
-                      <div className={clsx('flex justify-between items-center mb-2', qna.answer.user.companyName === proposal.ordererName ? 'text-gray-600' : 'text-blue-600')}>
+                    <div className={clsx('p-4 rounded-lg', qna.answer.user.type !== 'BIDDER' ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
+                      <div className={clsx('flex justify-between items-center mb-2', qna.answer.user.type !== 'BIDDER' ? 'text-gray-600' : 'text-blue-600')}>
                         <span className="text-xs">답변 완료 ({format(new Date(qna.answer.createdAt), 'yyyy.MM.dd')})</span>
-                        <i className={clsx('fa-solid', qna.answer.user.companyName === proposal.ordererName ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
+                        <i className={clsx('fa-solid', qna.answer.user.type !== 'BIDDER' ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
                       </div>
                       <p className="text-sm text-gray-900">{qna.answer.content}</p>
                     </div>
@@ -316,7 +314,18 @@ export default function Details() {
                   제안서 등 파일 업로드하기
                 </DialogTrigger>
                 <DialogContent className="bg-white rounded-lg min-w-[500px] max-w-fit p-6">
-                  <fetcher.Form action="." method="POST" encType="multipart/form-data">
+                  <fetcher.Form
+                    action="./file-upload"
+                    method="POST"
+                    onSubmit={(e: React.FormEvent) => {
+                      e.preventDefault();
+
+                      const formData = new FormData();
+                      files?.forEach((file) => formData.append('file', file));
+
+                      fetcher.submit(formData, { method: 'POST', action: './file-upload', encType: 'multipart/form-data' });
+                    }}
+                  >
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="text-lg font-medium text-gray-900">파일 첨부</h3>
                       <DialogClose type="reset" className="text-gray-400 hover:text-gray-500">

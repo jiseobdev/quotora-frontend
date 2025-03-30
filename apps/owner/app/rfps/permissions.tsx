@@ -73,8 +73,6 @@ async function deletePermission(id: string, body: { accountId?: number }, token?
     body: JSON.stringify(body),
   });
 
-  console.log(response, token, body)
-
   if (!response.ok) {
     if (response.status >= 400 && response.status < 500) {
       throw new UNSAFE_ErrorResponseImpl(
