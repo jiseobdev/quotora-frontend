@@ -46,7 +46,7 @@ export const accessTokenCookie = createCookie('access_token', {
   domain: process.env.NODE_ENV === 'production' ? 'quotora.xyz' : undefined,
   sameSite: 'strict',
   path: '/',
-  maxAge: 60 * 60,
+  maxAge: 24 * 60 * 60,
 });
 
 export async function getAccessToken(request: Request) {
