@@ -1,4 +1,4 @@
-import { data, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react-router";
+import { data, Link, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from "react-router";
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { differenceInCalendarDays, format } from "date-fns";
@@ -262,11 +262,52 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
           </div>
           <div id="communication-section" className="mt-6 space-y-4">
             {proposals.filter((proposal) => proposal.nda && proposal.participate).map((proposal) => (
-              <div key={proposal.id} className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium">{proposal.lawfirmName} 커뮤니케이션</h3>
+              <div key={proposal.id} className="bg-white rounded-lg shadow-sm">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-medium">{proposal.lawfirmName} 제안서</h3>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center mb-4">
+                        <i className="text-[#4F46E5] mr-2 fa-regular fa-paper-plane"></i>
+                        <span className="text-sm">발송일: {format(new Date(proposal.updatedAt), 'yyyy.MM.dd HH:mm:ss')}</span>
+                      </div>
+                      {/* <div className="flex items-center space-x-4">
+                    <button className="px-4 py-2 bg-[#4F46E5] text-white rounded-lg">
+                      <i className="mr-2 fa-solid fa-eye"></i>제안서 보기
+                    </button>
+                    <button className="px-4 py-2 border border-gray-300 rounded-lg">
+                      <i className="mr-2 fa-solid fa-download"></i>PDF 다운로드
+                    </button>
+                  </div> */}
+                    </div>
+                    <div className="space-y-4">
+                      {/* <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="text-sm font-medium mb-2">추가 발송 메일</h4>
+                    <input type="email" className="w-full rounded-lg border-gray-300 text-sm" placeholder="추가 수신인 이메일 입력" />
+                  </div> */}
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <h4 className="text-sm font-medium mb-2">추가 파일</h4>
+                        <div className="flex flex-col gap-2">
+                          {proposal.files.map((file) => (
+                            <Link key={file.id} to={file.url} target="_blank" className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <i className={`text-[#4F46E5] mr-2 fa-regular ${'pdf,docx,xlsx'.includes(file.name.split('.').at(-1) ?? 'undefined') ? `fa-file-${file.name.split('.').at(-1)}` : 'fa-file'}`}></i>
+                                <span className="text-sm">{file.name}</span>
+                              </div>
+                              <Link to={file.url} target="_blank" className="text-[#4F46E5]">
+                                <i className="fa-solid fa-download"></i>
+                              </Link>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-4">
+                <div className="border-t border-gray-200 p-6 space-y-4">
+                  <h3 className="text-lg font-medium mb-6">{proposal.lawfirmName}와 연락하기</h3>
                   {qnas[proposal.id].map((qna) => (
                     <div key={qna.question.id} className="flex flex-col space-y-3">
                       <div className={clsx('p-4 rounded-lg', qna.question.user.companyName === proposal.ordererName ? 'bg-blue-50 ml-6' : 'bg-gray-50 mr-6')}>

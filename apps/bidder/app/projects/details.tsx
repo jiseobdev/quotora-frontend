@@ -200,7 +200,7 @@ export default function Details() {
               <div className="bg-gray-50 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <i className="text-[#4F46E5] mr-2" data-fa-i2svg=""><svg className="svg-inline--fa fa-paper-plane" aria-hidden="true" focusable="false" data-prefix="far" data-icon="paper-plane" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M16.1 260.2c-22.6 12.9-20.5 47.3 3.6 57.3L160 376V479.3c0 18.1 14.6 32.7 32.7 32.7c9.7 0 18.9-4.3 25.1-11.8l62-74.3 123.9 51.6c18.9 7.9 40.8-4.5 43.9-24.7l64-416c1.9-12.1-3.4-24.3-13.5-31.2s-23.3-7.5-34-1.4l-448 256zm52.1 25.5L409.7 90.6 190.1 336l1.2 1L68.2 285.7zM403.3 425.4L236.7 355.9 450.8 116.6 403.3 425.4z"></path></svg></i>
+                    <i className="text-[#4F46E5] mr-2 fa-regular fa-paper-plane"></i>
                     <span className="text-sm">발송일: {format(new Date(proposal.updatedAt), 'yyyy.MM.dd HH:mm:ss')}</span>
                   </div>
                   {/* <div className="flex items-center space-x-4">
@@ -216,7 +216,7 @@ export default function Details() {
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
                     <h4 className="text-sm font-medium mb-2">수신처</h4>
                     <div className="flex items-center text-sm text-gray-600">
-                      <i className="mr-2" data-fa-i2svg=""><svg className="svg-inline--fa fa-envelope" aria-hidden="true" focusable="false" data-prefix="far" data-icon="envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M64 112c-8.8 0-16 7.2-16 16v22.1L220.5 291.7c20.7 17 50.4 17 71.1 0L464 150.1V128c0-8.8-7.2-16-16-16H64zM48 212.2V384c0 8.8 7.2 16 16 16H448c8.8 0 16-7.2 16-16V212.2L322 328.8c-38.4 31.5-93.7 31.5-132 0L48 212.2zM0 128C0 92.7 28.7 64 64 64H448c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128z"></path></svg></i>
+                      <i className="mr-2 fa-regular fa-envelope"></i>
                       <span>발주사 프로젝트 페이지</span>
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export default function Details() {
                     <h4 className="text-sm font-medium mb-2">추가 파일</h4>
                     <div className="flex flex-col gap-2">
                       {proposal.files.map((file) => (
-                        <div key={file.id} className="flex items-center justify-between">
+                        <Link key={file.id} to={file.url} target="_blank" className="flex items-center justify-between">
                           <div className="flex items-center">
                             <i className={`text-[#4F46E5] mr-2 fa-regular ${'pdf,docx,xlsx'.includes(file.name.split('.').at(-1) ?? 'undefined') ? `fa-file-${file.name.split('.').at(-1)}` : 'fa-file'}`}></i>
                             <span className="text-sm">{file.name}</span>
@@ -236,7 +236,7 @@ export default function Details() {
                           <Link to={file.url} target="_blank" className="text-[#4F46E5]">
                             <i className="fa-solid fa-download"></i>
                           </Link>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   </div>

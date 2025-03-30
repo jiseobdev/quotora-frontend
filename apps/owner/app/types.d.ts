@@ -36,8 +36,8 @@ interface Proposal {
   lawfirmName: string;
   nda: boolean;
   participate: boolean;
-  files: [];
-  status: string;
+  files: ProposalFile[];
+  status: ProposalStatus;
   createdAt: string;
   updatedAt: string;
   name: string;
@@ -49,6 +49,14 @@ interface Proposal {
   specialRequirements: string;
   oralPresentation: boolean;
   sentAt: string;
+}
+
+type ProposalStatus = 'SENT' | 'ONGOING_BIDDING' | 'COMPLETED_BIDDING';
+
+interface ProposalFile {
+  id: number;
+  name: string;
+  url: string;
 }
 
 interface Notice {
