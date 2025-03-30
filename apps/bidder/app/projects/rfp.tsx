@@ -109,7 +109,7 @@ export default function Rfp() {
               </div>
               <div>
                 <h4 className="font-medium text-gray-700 mb-2">구두 프리젠테이션</h4>
-                <p className="text-sm text-gray-600">{rfp.oralPresentation ? '필요' : '없ㅇ ㅁ'}</p>
+                <p className="text-sm text-gray-600">{rfp.oralPresentation ? '필요' : '없음'}</p>
               </div>
             </div>
             <div className="mt-8 flex justify-end space-x-4">
