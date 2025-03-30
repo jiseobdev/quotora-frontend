@@ -57,7 +57,7 @@ export default function Rfp() {
   const [otherReason, setOtherReason] = useState('');
 
   return (
-    <main className="py-6">
+    <main className="py-6 min-h-[calc(100vh-var(--spacing)*16)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex flex-col">
