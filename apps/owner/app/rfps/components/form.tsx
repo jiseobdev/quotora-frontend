@@ -61,21 +61,21 @@ export default function RfpForm({ rfp }: Props) {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label htmlFor="expectedSchedule" className="block text-sm font-medium text-gray-700 mb-2">예상 일정</label>
-              <input id="expectedSchedule" name="expectedSchedule" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.expectedSchedule ? format(new Date(rfp?.expectedSchedule), 'yyyy-MM-dd') : undefined} />
+              <input id="expectedSchedule" name="expectedSchedule" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.expectedSchedule ? format(new Date(rfp?.expectedSchedule), 'yyyy-MM-dd') : undefined} required />
             </div>
             <div>
               <label htmlFor="submissionDeadline" className="block text-sm font-medium text-gray-700 mb-2">RFP 제출 마감일</label>
-              <input id="submissionDeadline" name="submissionDeadline" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.submissionDeadline ? format(new Date(rfp?.submissionDeadline), 'yyyy-MM-dd') : undefined} />
+              <input id="submissionDeadline" name="submissionDeadline" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.submissionDeadline ? format(new Date(rfp?.submissionDeadline), 'yyyy-MM-dd') : undefined} required />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label htmlFor="selectionNotificationDate" className="block text-sm font-medium text-gray-700 mb-2">자문사 선정 통보 예정일</label>
-              <input id="selectionNotificationDate" name="selectionNotificationDate" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.selectionNotificationDate ? format(new Date(rfp?.selectionNotificationDate), 'yyyy-MM-dd') : undefined} />
+              <input id="selectionNotificationDate" name="selectionNotificationDate" type="date" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.selectionNotificationDate ? format(new Date(rfp?.selectionNotificationDate), 'yyyy-MM-dd') : undefined} required />
             </div>
             <div>
               <label htmlFor="isOralPresentation" className="block text-sm font-medium text-gray-700 mb-2">구두 프리젠테이션 여부</label>
-              <select id="isOralPresentation" name="isOralPresentation" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.oralPresentation ? 'true' : 'false'}>
+              <select id="isOralPresentation" name="isOralPresentation" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4F46E5]" defaultValue={rfp?.oralPresentation ? 'true' : 'false'} required>
                 <option value="true">필요</option>
                 <option value="false">불필요</option>
               </select>
