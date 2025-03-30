@@ -237,7 +237,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                         </td>
                         <td className="px-4 py-4 text-center"><span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">{proposal.status}</span></td>
                         <td className="px-4 py-4 text-center">
-                          <div className="flex gap-2">
+                          <div className="flex justify-center gap-2">
                             <button className="px-3 py-1 text-xs bg-green-500 text-white rounded-full hover:bg-green-600">Y</button>
                             <button className="px-3 py-1 text-xs bg-red-500 text-white rounded-full hover:bg-red-600">N</button>
                           </div>
