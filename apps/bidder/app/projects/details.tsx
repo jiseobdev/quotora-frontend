@@ -132,6 +132,8 @@ export default function Details() {
     }
   }, [modalOpened]);
 
+  console.log(qnas);
+
   return (
     <main id="project-content" className="py-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -267,7 +269,7 @@ export default function Details() {
                       <p className="text-sm text-gray-900">{qna.answer.content}</p>
                     </div>
                   )}
-                  {!qna.answer && qna.question.user.companyName !== proposal.lawfirmName && (
+                  {!qna.answer && qna.question.user.type !== 'BIDDER' && (
                     <QnAsForm action="./qnas" method="POST" className="flex gap-2 ml-6">
                       <input name="rfpId" type="hidden" value={rfp.id} />
                       <input name="questionId" type="hidden" value={qna.question.id} />

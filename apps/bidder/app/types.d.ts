@@ -1,5 +1,6 @@
 interface User {
   id: number;
+  type: 'BIDDER' | 'ORDERER';
   name: string;
   position: string;
   profileImage: string;
@@ -49,7 +50,7 @@ interface QnA {
 
 interface Proposal {
   id: number;
-  lawfirmName: string;
+  // lawfirmName: string;
   nda: boolean;
   participate: boolean;
   files: ProposalFile[];

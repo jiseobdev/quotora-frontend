@@ -1,5 +1,6 @@
 interface User {
   id: number;
+  type: 'BIDDER' | 'ORDERER';
   name: string;
   position: string;
   profileImage: string;

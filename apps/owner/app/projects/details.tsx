@@ -287,7 +287,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
                           <p className="text-sm text-gray-900">{qna.answer.content}</p>
                         </div>
                       )}
-                      {!qna.answer && qna.question.user.companyName !== proposal.ordererName && (
+                      {!qna.answer && qna.question.user.type === 'BIDDER' && (
                         <QnAsForm action={`./proposals/${proposal.id}/qnas`} method="POST" className="flex gap-2 ml-6">
                           <input name="questionId" type="hidden" value={qna.question.id} />
                           <input name="content" type="text" className="flex-grow rounded-lg px-4 py-2 border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="답변을 입력하세요" />

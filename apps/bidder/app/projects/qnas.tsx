@@ -37,3 +37,14 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 
   return data({ success: true })
 }
+
+export async function clientAction({ request, serverAction }: Route.ClientActionArgs) {
+  const formData = await request.clone().formData();
+  const body = Object.fromEntries(formData.entries());
+
+  if (!body.content) {
+    return data({ success: false, errors: { content: '내용을 입력해주세요.' } });
+  }
+
+  return serverAction();
+}
