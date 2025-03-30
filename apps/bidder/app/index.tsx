@@ -10,7 +10,7 @@ export default function Index() {
               <NavLink to="/" className="text-2xl font-bold text-[#4F46E5] cursor-pointer">Quotora</NavLink>
               <nav className="hidden md:flex space-x-8">
                 <span className="text-gray-900 hover:text-[#4F46E5] cursor-pointer">서비스 소개</span>
-                <span className="text-gray-900 hover:text-[#4F46E5] cursor-pointer">요금제</span>
+                {/* <span className="text-gray-900 hover:text-[#4F46E5] cursor-pointer">요금제</span> */}
                 <a href="mailto:support@quotora.xyz" className="text-gray-900 hover:text-[#4F46E5] cursor-pointer">고객지원</a>
               </nav>
             </div>
@@ -21,7 +21,7 @@ export default function Index() {
           </div>
         </div>
       </header>
-      <section id="hero" className="pt-24 h-[550px]">
+      <section id="hero" className="pt-24 h-[550px] overflow-hidden">
         <div className="container mx-auto px-6 py-16">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -34,7 +34,7 @@ export default function Index() {
             </div>
             <div className="relative h-[400px]">
               <div className="absolute inset-0">
-                <img className="rounded-2xl shadow-2xl w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/ba5ec32ef4-1ddc647023b97190ae5b.png" alt="professional dashboard interface" />
+                <img className="rounded-2xl shadow-2xl w-full h-full object-cover" src="/images/83628c2e-5500-4c9a-bda8-a224dd2581d8.png" alt="dashboard interface" />
               </div>
             </div>
           </div>
@@ -82,13 +82,13 @@ export default function Index() {
           </div>
         </div>
       </section> */}
-      <section id="cta" className="bg-[#4F46E5] py-20">
+      {/* <section id="cta" className="bg-[#4F46E5] py-20">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-6">지금 바로 시작하세요</h2>
           <p className="text-xl text-white mb-8">14일 무료 체험으로 Quotora의 모든 기능을 경험해보세요</p>
           <Link to="/signup" className="bg-white text-[#4F46E5] px-8 py-3 rounded-lg hover:bg-gray-100 break-keep cursor-pointer">무료로 시작하기</Link>
         </div>
-      </section>
+      </section> */}
       <footer id="footer" className="bg-[#303A52] text-white py-12">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
@@ -103,7 +103,7 @@ export default function Index() {
               <h4 className="font-bold mb-4">서비스</h4>
               <ul className="space-y-2">
                 <li><span className="text-gray-300 hover:text-white cursor-pointer">기능 소개</span></li>
-                <li><span className="text-gray-300 hover:text-white cursor-pointer">요금제</span></li>
+                {/* <li><span className="text-gray-300 hover:text-white cursor-pointer">요금제</span></li> */}
               </ul>
             </div>
             {/* <div>
