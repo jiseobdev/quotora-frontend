@@ -5,6 +5,7 @@ import { data, Form, replace, UNSAFE_ErrorResponseImpl, useLoaderData } from "re
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogTrigger } from "~/components/ui/alert-dialog";
 import { getDDay } from "~/lib/date";
 import { nl2br } from "~/lib/string";
+import { useState } from "react";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -51,6 +52,9 @@ export async function action({ request, params: { id } }: Route.ActionArgs) {
 export default function Rfp() {
   const { user, proposal } = useLoaderData<typeof loader>();
   const { rfp } = proposal;
+
+  const [reasonOption, setReasonOption] = useState<'conflict' | 'other' | null>(null);
+  const [otherReason, setOtherReason] = useState('');
 
   return (
     <main className="py-6">
@@ -115,42 +119,44 @@ export default function Rfp() {
                     거절하기
                   </button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <div id="survey-modal" className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-                    <Form method="DELETE" className="p-6">
-                      <div className="text-center mb-6">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          {rfp.companyName}가 {user.name}님의 제안서를 기다리고 있습니다.
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-600">
-                          정말 제안서를 제출하지 않으실건가요? 이유를 알려주실 수 있을까요?
-                        </p>
+                <AlertDialogContent className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+                  <Form method="DELETE" className="p-6">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-medium text-gray-900">
+                        발주사가 제안서를 기다리고 있습니다.
+                      </h3>
+                      <p className="mt-2 text-sm text-gray-600">
+                        정말 제안서를 제출하지 않으실건가요? 이유를 알려주실 수 있을까요?
+                      </p>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center">
+                        <input type="radio" id="conflict" name="reason" className="h-4 w-4 text-[#4F46E5] border-gray-300 focus:ring-[#4F46E5]" value="기존고객과 이해상충 이슈가 있습니다." onChange={() => setReasonOption('conflict')} />
+                        <label htmlFor="conflict" className="ml-3 text-sm text-gray-700">기존고객과 이해상충 이슈가 있습니다.</label>
                       </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center">
-                          <input type="radio" id="conflict" name="reason" className="h-4 w-4 text-[#4F46E5] border-gray-300 focus:ring-[#4F46E5]" value="기존고객과 이해상충 이슈가 있습니다." />
-                          <label htmlFor="conflict" className="ml-3 text-sm text-gray-700">기존고객과 이해상충 이슈가 있습니다.</label>
-                        </div>
-                        <div className="flex items-center">
-                          <input type="radio" id="other" name="reason" className="h-4 w-4 text-[#4F46E5] border-gray-300 focus:ring-[#4F46E5]" value="" />
-                          <label htmlFor="other" className="ml-3 text-sm text-gray-700">기타 사유</label>
-                        </div>
-                        <div className="mt-3">
-                          <textarea name="reason" className="w-full px-4 py-2 rounded-md border-gray-300 shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm" rows={3} placeholder="기타 사유를 입력해주세요"></textarea>
-                        </div>
+                      <div className="flex items-center">
+                        <input type="radio" id="other" name="reason" className="h-4 w-4 text-[#4F46E5] border-gray-300 focus:ring-[#4F46E5]" value="" onChange={() => setReasonOption('other')} />
+                        <label htmlFor="other" className="ml-3 text-sm text-gray-700">기타 사유</label>
                       </div>
-                      <div className="mt-6 flex justify-end space-x-3">
-                        <AlertDialogCancel>
-                          <button type="reset" className="px-4 py-2 text-sm font-medium text-[#4F46E5] bg-[#F5F3FF] rounded-md hover:bg-[#EDE9FE] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5]">
-                            입찰 참가하기
-                          </button>
-                        </AlertDialogCancel>
-                        <button type="submit" className="px-4 py-2 text-sm font-medium text-white bg-[#4F46E5] rounded-md hover:bg-[#4338CA] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5]">
-                          참가하지 않기
+                      <div className="mt-3">
+                        <textarea name="reason" className="w-full px-4 py-2 rounded-md border-gray-300 shadow-sm focus:border-[#4F46E5] focus:ring-[#4F46E5] text-sm" rows={3} placeholder="기타 사유를 입력해주세요" disabled={reasonOption !== 'other'} value={otherReason} onChange={(e) => setOtherReason(e.target.value)}></textarea>
+                      </div>
+                    </div>
+                    <div className="mt-6 flex justify-end space-x-3">
+                      <AlertDialogCancel>
+                        <button type="reset" className="px-4 py-2 text-sm font-medium text-[#4F46E5] bg-[#F5F3FF] rounded-md hover:bg-[#EDE9FE] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5]">
+                          입찰 참가하기
                         </button>
-                      </div>
-                    </Form>
-                  </div>
+                      </AlertDialogCancel>
+                      <button
+                        type="submit"
+                        className="px-4 py-2 text-sm font-medium text-white bg-[#4F46E5] rounded-md hover:bg-[#4338CA] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4F46E5] disabled:bg-gray-200 disabled:text-gray-400"
+                        disabled={reasonOption === null || (reasonOption === 'other' && !otherReason)}
+                      >
+                        참가하지 않기
+                      </button>
+                    </div>
+                  </Form>
                 </AlertDialogContent>
               </AlertDialog>
               <Form method="POST">
