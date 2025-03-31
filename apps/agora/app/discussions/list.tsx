@@ -1,9 +1,10 @@
 import { Link, useLocation, useSubmit } from "react-router";
-import { categoryToLabel } from "./constants";
+import { CATEGORY_TO_LABEL, CONTENT_ELLIPSIS, CONTENT_MAX_LENGTH } from "./constants";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Route } from "./+types/list";
 import { fetchDiscussions } from "~/lib/fetch";
+import { format } from 'date-fns';
 
 export async function loader({ request }: Route.LoaderArgs) {
   const text = await request.text();
@@ -34,7 +35,7 @@ export default function List({ loaderData }: Route.ComponentProps) {
         <div id="categories" className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <div className="flex space-x-4 overflow-x-auto">
-              {Object.entries(categoryToLabel).map(([value, label]) => (
+              {Object.entries(CATEGORY_TO_LABEL).map(([value, label]) => (
                 <Link
                   key={value}
                   to={value ? `?category=${value}` : '/discussions'}
@@ -57,8 +58,53 @@ export default function List({ loaderData }: Route.ComponentProps) {
             </div>
           </div>
         </div>
-        <div id="posts" className="space-y-6">
-          <div id="post-1" className="bg-white rounded-xl shadow-sm p-6">
+        <div className="space-y-6">
+          {discussions.map((discussion) => (
+            <Link key={discussion.id} to={`./${discussion.id}`} className="grid bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="text-lg font-semibold">{discussion.title}</h3>
+                <div className="flex items-center space-x-2">
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <i className="fa-solid fa-share-nodes"></i>
+                  </button>
+                </div>
+              </div>
+              <p className="text-gray-600 mb-4 overflow-hidden whitespace-nowrap text-ellipsis">
+                {discussion.content.length > CONTENT_MAX_LENGTH ?
+                  discussion.content.slice(0, CONTENT_MAX_LENGTH - CONTENT_ELLIPSIS.length) + CONTENT_ELLIPSIS :
+                  discussion.content
+                }
+              </p>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {discussion.tags.map((tag) => (
+                  <span key={tag} className="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-sm">#{tag}</span>
+                ))}
+              </div>
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <div className="flex items-center space-x-4">
+                  <button className="flex items-center text-gray-500 hover:text-red-500">
+                    <i className="fa-regular fa-heart mr-1"></i>
+                    {discussion.likeCount}
+                  </button>
+                  <span className="flex items-center">
+                    <i className="fa-regular fa-comment mr-1"></i>
+                    {discussion.commentCount}
+                  </span>
+                  <span className="flex items-center">
+                    <i className="fa-regular fa-eye mr-1"></i>
+                    {discussion.viewCount}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <img src={discussion.user.profileImage} alt={`${discussion.user.name} 프로필 이미지`} className="w-6 h-6 rounded-full" />
+                  <span className="text-sm font-medium">{discussion.user.name}</span>
+                  <span>{discussion.user.companyName}</span>
+                  <span>{format(new Date(discussion.createdAt), 'yyyy.MM.dd')}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+          {/* <div id="post-1" className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-lg font-semibold">[Q&amp;A] 외국계 기업과의 계약서 관련 문의</h3>
               <div className="flex items-center space-x-2">
@@ -95,7 +141,6 @@ export default function List({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
           </div>
-
           <div id="post-2" className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-start justify-between mb-4">
               <h3 className="text-lg font-semibold">ESG 컴플라이언스 세미나 후기</h3>
@@ -132,7 +177,7 @@ export default function List({ loaderData }: Route.ComponentProps) {
                 <span>2025.02.23</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </main>

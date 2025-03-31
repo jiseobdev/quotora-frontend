@@ -2,7 +2,7 @@ import { UNSAFE_ErrorResponseImpl } from "react-router";
 import { getAccessToken } from "~/auth.server";
 import { Category } from "~/discussions/constants";
 
-async function fetchData<T>(input: string, init?: RequestInit): Promise<T> {
+async function fetchText(input: string, init?: RequestInit): Promise<string> {
   const response = await fetch(new URL(input, process.env.BACKEND_API_URL), init);
 
   if (!response.ok) {
@@ -20,7 +20,12 @@ async function fetchData<T>(input: string, init?: RequestInit): Promise<T> {
     }
   }
 
-  return (await response.json()) as T;
+  return await response.text();
+}
+
+async function fetchData<T>(input: string, init?: RequestInit): Promise<T> {
+  const result = await fetchText(input, init);
+  return JSON.parse(result) as T;
 }
 
 export async function fetchDiscussions(request: Request, options?: { category?: string; orderBy?: string; search?: string }) {
@@ -64,4 +69,62 @@ export async function fetchDiscussions(request: Request, options?: { category?: 
 
     return result;
   }
+}
+
+export async function fetchDiscussion(request: Request, id: string) {
+  const token = await getAccessToken(request);
+
+  const result = await fetchData<Discussion>(`/api/v1/agora/discussions/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  return result;
+}
+
+export async function fetchDiscussionComments(request: Request, id: string) {
+  const token = await getAccessToken(request);
+
+  const result = await fetchData<Comment[]>(`/api/v1/agora/discussions/${id}/answers`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  return result;
+}
+
+export async function patchDiscussionViewContent(request: Request, id: string) {
+  const token = await getAccessToken(request);
+
+  try {
+    await fetchText(`/api/v1/agora/discussions/${id}/view-count`, {
+      method: 'PATCH',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+  } catch (error: unknown) {
+    return false;
+  }
+
+  return true;
+}
+
+export async function postDiscussionComment(request: Request, id: string, body: { content: string; isAnonymous: boolean; parentId?: number }) {
+  const token = await getAccessToken(request);
+
+  await fetchText(`/api/v1/agora/discussions/${id}/answers`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify(body),
+  });
 }
