@@ -166,18 +166,18 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
 [${user.companyName}] 드림`
     }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
 
-    const restProposals = participatedProposals.filter((proposal) => proposal.id !== proposalId);
+    //     const restProposals = participatedProposals.filter((proposal) => proposal.id !== proposalId);
 
-    for (const proposal of restProposals) {
-      await selectsSubmit(null, { action: `./proposals/${proposal.id}/unselect`, method: 'POST' });
-      await submitQnAs({
-        content: `안녕하세요.\
-저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, 이번에는 함께 진행할 수 없음을 알려드립니다. 관심 가져주시고 시간을 내어주셔서 감사합니다.\
-추후 다른 기회가 있을 때 다시 연락드리겠습니다.\
-감사합니다.\
-[${user.companyName}] 드림`
-      }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
-    }
+    //     for (const proposal of restProposals) {
+    //       await selectsSubmit(null, { action: `./proposals/${proposal.id}/unselect`, method: 'POST' });
+    //       await submitQnAs({
+    //         content: `안녕하세요.\
+    // 저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, 이번에는 함께 진행할 수 없음을 알려드립니다. 관심 가져주시고 시간을 내어주셔서 감사합니다.\
+    // 추후 다른 기회가 있을 때 다시 연락드리겠습니다.\
+    // 감사합니다.\
+    // [${user.companyName}] 드림`
+    //       }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
+    //     }
   };
   const unselectProposal = async (proposalId: number) => {
     const unselectedProposal = participatedProposals.filter((proposal) => proposal.id === proposalId)[0];
