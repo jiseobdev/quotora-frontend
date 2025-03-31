@@ -2,7 +2,7 @@ import { data, Link, UNSAFE_ErrorResponseImpl, useFetcher, useLoaderData } from 
 import type { Route } from "./+types/details";
 import { getAccessToken } from "~/auth.server";
 import { differenceInCalendarDays, format } from "date-fns";
-import { fetchQnas, fetchRfp } from "~/lib/fetch";
+import { fetchCurrentUser, fetchQnas, fetchRfp } from "~/lib/fetch";
 import { useEffect, useRef } from "react";
 import clsx from "clsx";
 import { PROPOSAL_STATUS_TO_LABEL } from "./constants";
@@ -122,6 +122,7 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
 
+  const user = await fetchCurrentUser(token);
   const rfp = await fetchRfp(id, token);
   const proposals = await fetchProposals(id, token);
   const notices = await fetchNotices(id, token);
@@ -131,7 +132,7 @@ export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const qnas = Object.fromEntries(proposals.map((proposal, index) => [proposal.id.toString(), qnaLists[index]]));
 
   return data({
-    user: { id: decodeJwtPayload(token).userId },
+    user,
     rfp,
     proposals,
     notices,
@@ -162,7 +163,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
 저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, [${selectedProposal.lawfirmName}]님을 선정하게 되었음을 기쁜 마음으로 알려드립니다. 함께 진행할 수 있게 되어 매우 기대됩니다.\
 계약 조건을 반영한 자문 계약서를 보내주시면 초안을 검토한 후 다시 연락드리겠습니다.\
 감사합니다.\
-[${rfp.companyName}}] 드림`
+[${user.companyName}] 드림`
     }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
 
     const restProposals = participatedProposals.filter((proposal) => proposal.id !== proposalId);
@@ -174,7 +175,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
 저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, 이번에는 함께 진행할 수 없음을 알려드립니다. 관심 가져주시고 시간을 내어주셔서 감사합니다.\
 추후 다른 기회가 있을 때 다시 연락드리겠습니다.\
 감사합니다.\
-[${rfp.companyName}}] 드림`
+[${user.companyName}] 드림`
       }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
     }
   };
@@ -187,7 +188,7 @@ export default function Details({ params: { id } }: Route.ComponentProps) {
 저희 회사의 [${rfp.name}] 입찰에 대해 검토한 결과, 이번에는 함께 진행할 수 없음을 알려드립니다. 관심 가져주시고 시간을 내어주셔서 감사합니다.\
 추후 다른 기회가 있을 때 다시 연락드리겠습니다.\
 감사합니다.\
-[${rfp.companyName}}] 드림`
+[${user.companyName}}] 드림`
     }, { action: `./proposals/${proposalId}/qnas`, method: 'POST' });
   };
 
