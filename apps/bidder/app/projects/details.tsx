@@ -10,6 +10,7 @@ import { FileInput, FileUploader, FileUploaderContent, FileUploaderItem } from "
 import { useEffect, useRef, useState } from "react";
 import { type FileUpload, parseFormData } from "@mjackson/form-data-parser";
 import { MAX_FILES } from "./constants";
+import { nl2br } from "~/lib/string";
 
 export async function loader({ request, params: { id } }: Route.LoaderArgs) {
   const token = await getAccessToken(request);
@@ -256,7 +257,7 @@ export default function Details() {
                       </span>
                       <i className={clsx('fa-solid', qna.question.user.type !== 'BIDDER' ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
                     </div>
-                    <p className="text-sm text-gray-700">{qna.question.content}</p>
+                    <p className="text-sm text-gray-700">{nl2br(qna.question.content)}</p>
                   </div>
                   {qna.answer && (
                     <div className={clsx('p-4 rounded-lg', qna.answer.user.type !== 'BIDDER' ? 'bg-gray-50 mr-6' : 'bg-blue-50 ml-6')}>
@@ -264,7 +265,7 @@ export default function Details() {
                         <span className="text-xs">답변 완료 ({format(new Date(qna.answer.createdAt), 'yyyy.MM.dd')})</span>
                         <i className={clsx('fa-solid', qna.answer.user.type !== 'BIDDER' ? 'fa-arrow-right' : 'fa-arrow-left')}></i>
                       </div>
-                      <p className="text-sm text-gray-900">{qna.answer.content}</p>
+                      <p className="text-sm text-gray-900">{nl2br(qna.answer.content)}</p>
                     </div>
                   )}
                   {!qna.answer && qna.question.user.type !== 'BIDDER' && (
