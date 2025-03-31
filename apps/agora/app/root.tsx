@@ -59,8 +59,13 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   if (isRouteErrorResponse(error)) {
     if (error.status === 401 || error.status === 403) {
       if (typeof window !== "undefined") {
-        window.location.href = "/signout";
+        const url = new URL(window.location.href);
+        const redirectTo = url.pathname + url.search;
+        const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
+
+        window.location.href = `/signout?${searchParams}`;
       }
+
       return null;
     }
 
