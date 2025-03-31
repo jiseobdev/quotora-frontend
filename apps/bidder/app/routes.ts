@@ -36,4 +36,6 @@ export default [
       route('team', './settings/team.tsx'),
     ]),
   ]),
+
+  route('agora/*', './agora/redirect.tsx'),
 ] satisfies RouteConfig;

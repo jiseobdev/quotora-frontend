@@ -2,7 +2,7 @@ import { redirect } from 'react-router';
 import { accessTokenCookie, getAccessToken } from '~/auth.server';
 import type { Route } from './+types/signout';
 
-const SCOPE_TO_SUBDOMAIN = {
+const SCOPE_TO_URL = {
   'BIDDER': process.env.BIDDER_URL ?? 'https://bidder.quotora.xyz',
   'ORDERER': process.env.OWNER_URL ?? 'https://owner.quotora.xyz',
 };
@@ -24,7 +24,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   if (token) {
     const payload = decodeJwtPayload(token) as { scope: 'BIDDER' | 'ORDERER' };
-    const subdomain = SCOPE_TO_SUBDOMAIN[payload.scope];
+    const scopeUrl = SCOPE_TO_URL[payload.scope];
 
     const oldSearchParams = new URLSearchParams(url.search);
     const oldRedirectTo = oldSearchParams.get('redirectTo');
@@ -32,7 +32,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     const redirectTo = oldRedirectTo ? `/agora${decodeURIComponent(oldRedirectTo)}` : '/agora';
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
 
-    return redirect(`https://${subdomain}.quotora.com/signin?${searchParams}`, {
+    return redirect(`${scopeUrl}/signin?${searchParams}`, {
       headers: {
         'Set-Cookie': await accessTokenCookie.serialize('', { maxAge: 0 }),
       },

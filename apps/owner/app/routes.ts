@@ -46,5 +46,7 @@ export default [
       route('colleagues', './api/colleagues.tsx'),
       route('current-user', './api/current-user.tsx'),
     ]),
+
+    route('agora/*', './agora/redirect.tsx'),
   ]),
 ] satisfies RouteConfig;
